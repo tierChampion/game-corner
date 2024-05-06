@@ -5,22 +5,22 @@ interface UserProviderProps {
     children: ReactNode;
 }
 
+const SESSION_STORAGE_ID_KEY = "uid";
+
 const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const [id, setId] = useState<string>('');
 
     const generateRandomUserID = () => {
-        return Date.now().toString(36) + Math.random().toString(36).substring(2, 12).padStart(12);
+        return Date.now().toString(36) + Math.random().toString(36).substring(2, 12).padStart(12, "0");
     }
 
     useEffect(() => {
-        let userId = sessionStorage.getItem("uid") || "";
+        let userId: string = sessionStorage.getItem(SESSION_STORAGE_ID_KEY) || "";
 
         if (userId === "") {
-            console.log("localset");
             userId = generateRandomUserID();
-            sessionStorage.setItem("uid", userId);
+            sessionStorage.setItem(SESSION_STORAGE_ID_KEY, userId);
         }
-        console.log("ok");
 
         setId(userId);
     }, []);

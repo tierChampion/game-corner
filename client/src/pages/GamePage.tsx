@@ -1,4 +1,4 @@
-const GamePage = () => {
+const GamePage: React.FC = () => {
 
     return (
         <div>
