@@ -3,7 +3,6 @@ import UserContext from "../contexts/UserContext";
 import { useContext } from "react";
 
 const HomePage: React.FC = () => {
-
     const state = useContext(UserContext);
 
     return (

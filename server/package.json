@@ -1,5 +1,21 @@
 {
   "dependencies": {
-    "express": "^4.19.2"
+    "@types/node": "^20.12.10",
+    "cors": "^2.8.5",
+    "dirname": "^0.1.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "dev": "npx nodemon --exec ts-node --esm server.ts",
+    "start": "npx nodemon out/server.js",
+    "build": "npx tsc"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2"
   }
 }
