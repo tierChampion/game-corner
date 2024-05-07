@@ -1,4 +1,4 @@
-import { HTTP_STATUS } from "../utils/http.ts";
+import { HTTP_STATUS } from "../utils/Http.ts";
 import { Request, Response } from "express";
 import {Router} from "express";
 import RoomService from "../services/Rooms.service.ts";
@@ -17,8 +17,8 @@ router.get("/", async (req: Request, res: Response) => {
 
 router.post("/", async (req: Request, res: Response) => {
     try {
-        // create the room
-        res.status(HTTP_STATUS.CREATED).json();
+        const newRoom = await roomService.createNewRoom();
+        res.status(HTTP_STATUS.CREATED).json(newRoom);
     } catch (err) {
         res.status(HTTP_STATUS.SERVER_ERROR).json(err);
     }

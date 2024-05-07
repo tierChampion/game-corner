@@ -1,32 +1,36 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useReducer, useState } from "react";
 import UserContext from "./UserContext";
+import { SESSION_STORAGE_ID_KEY } from "../env";
+import HTTPManager from "../utils/HTTPManager";
+import reducer from "../reducers/UserReducer";
 
 interface UserProviderProps {
     children: ReactNode;
 }
 
-const SESSION_STORAGE_ID_KEY = "uid";
+const STORAGE_KEY = SESSION_STORAGE_ID_KEY;
 
 const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-    const [id, setId] = useState<string>('');
 
-    const generateRandomUserID = () => {
-        return Date.now().toString(36) + Math.random().toString(36).substring(2, 12).padStart(12, "0");
-    }
-
-    useEffect(() => {
-        let userId: string = sessionStorage.getItem(SESSION_STORAGE_ID_KEY) || "";
+    const initializeId = () => {
+        let userId: string = sessionStorage.getItem(STORAGE_KEY) || "";
 
         if (userId === "") {
-            userId = generateRandomUserID();
-            sessionStorage.setItem(SESSION_STORAGE_ID_KEY, userId);
+            userId = crypto.randomUUID();
+            sessionStorage.setItem(STORAGE_KEY, userId);
         }
+        return userId;
+    }
 
-        setId(userId);
+    const [state, dispatch] = useReducer(reducer, { userId: initializeId(), roomId: "", isHost: false });
+    const api = new HTTPManager();
+
+    useEffect(() => {
+
     }, []);
 
     return (
-        <UserContext.Provider value={{ id }}>
+        <UserContext.Provider value={{ state, dispatch, api }}>
             {children}
         </UserContext.Provider>
     );

@@ -10,13 +10,15 @@ class RoomService {
     }
 
     async getAllRooms() {
-        return JSON.parse(await this.fsManager.readFile(ROOMS_FILE)).rooms;
+        return JSON.parse(await this.fsManager.readFile(ROOMS_FILE));
     }
 
-    async createNewRoom(id: string) {
+    async createNewRoom() {
         const rooms = await this.getAllRooms();
-        rooms.push({id});
+        const newRoom = {id: crypto.randomUUID()};
+        rooms.push(newRoom);
         await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
+        return newRoom;
     }
 
     async deleteRoom(id: string) {

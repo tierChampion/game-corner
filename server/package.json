@@ -1,4 +1,5 @@
 {
+  "name": "game-corner-server",
   "dependencies": {
     "@types/node": "^20.12.10",
     "cors": "^2.8.5",
@@ -8,9 +9,7 @@
     "typescript": "^5.4.5"
   },
   "scripts": {
-    "dev": "npx nodemon --exec ts-node --esm server.ts",
-    "start": "npx nodemon out/server.js",
-    "build": "npx tsc"
+    "start": "npx nodemon --ignore data server.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

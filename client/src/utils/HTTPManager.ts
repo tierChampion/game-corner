@@ -1,4 +1,4 @@
-import { SERVER_URL } from "./consts";
+import { SERVER_URL } from "../env";
 
 export const HTTPInterface = {
   SERVER_URL: `${SERVER_URL}/api`,
@@ -45,3 +45,19 @@ export const HTTPInterface = {
     return response.status;
   },
 };
+
+export default class HTTPManager {
+  private roomEndpoint: string;
+
+  constructor() {
+      this.roomEndpoint = "rooms";
+   }
+
+  async getAllRooms() {
+    return await HTTPInterface.GET(this.roomEndpoint);
+  }
+
+  async createRoom() {
+    return await HTTPInterface.POST(this.roomEndpoint, {});
+  }
+}

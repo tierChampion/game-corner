@@ -23,6 +23,7 @@ const RoomPage: React.FC = () => {
                     Start game
                 </button>
             </Link>
+            <button>Leave room</button>
         </div>
     );
 };

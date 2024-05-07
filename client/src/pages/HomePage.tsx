@@ -1,25 +1,22 @@
 import { Link } from "react-router-dom";
-import UserContext from "../contexts/UserContext";
+import UserContext, { useUserContext } from "../contexts/UserContext";
 import { useContext } from "react";
+import RoomCreationButton from "../components/RoomCreation";
 
 const HomePage: React.FC = () => {
-    const state = useContext(UserContext);
+    const state = useUserContext().state;
 
     return (
         <>
             Home page
-            <Link to="/room">
-                <button>
-                    Create room
-                </button>
-            </Link>
+            <RoomCreationButton text="Create room"/>
             <Link to="/join">
                 <button>
                     Join room
                 </button>
             </Link>
             <p>
-                id: {state.id}
+                id: {state.userId}
             </p>
         </>
     );
