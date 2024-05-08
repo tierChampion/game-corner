@@ -9,7 +9,7 @@ const App: React.FC = () => {
   const routes = [
     { path: "/", element: <HomePage /> },
     { path: "/join", element: <JoinPage /> },
-    { path: "/room", element: <RoomPage /> },
+    { path: "/room/:roomId", element: <RoomPage /> },
     { path: "/game", element: <GamePage /> },
   ];
 

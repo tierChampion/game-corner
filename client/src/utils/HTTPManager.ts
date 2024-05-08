@@ -57,6 +57,10 @@ export default class HTTPManager {
     return await HTTPInterface.GET(this.roomEndpoint);
   }
 
+  async getRoom(roomId: string) {
+    return await HTTPInterface.GET(`${this.roomEndpoint}/${roomId}`);
+  }
+
   async createRoom() {
     return await HTTPInterface.POST(this.roomEndpoint, {});
   }

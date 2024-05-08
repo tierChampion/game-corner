@@ -15,6 +15,15 @@ router.get("/", async (req: Request, res: Response) => {
     }
 });
 
+router.get("/:roomId", async (req: Request , res: Response) => {
+    try {
+        const room = await roomService.getRoom(req.params.roomId);
+        res.status(HTTP_STATUS.SUCCESS).json(room);
+    } catch (err) {
+        res.status(HTTP_STATUS.SERVER_ERROR).json(err);
+    }
+});
+
 router.post("/", async (req: Request, res: Response) => {
     try {
         const newRoom = await roomService.createNewRoom();

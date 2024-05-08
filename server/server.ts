@@ -1,8 +1,9 @@
-import express, {Request, Response, NextFunction} from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import path from "path";
 import { config } from "dotenv";
 import roomsRouter from "./routes/Rooms.ts";
+import ServerWebSocket from "./utils/Socket.ts";
 
 const app = express();
 config();
@@ -23,6 +24,9 @@ app.use(express.json({ limit: SIZE_LIMIT }));
 app.use(express.static(PUBLIC_PATH));
 
 app.use("/api/rooms", roomsRouter);
+
+const SOCKET_PORT = parseInt(process.env.SOCKET_PORT || "");
+const socket = new ServerWebSocket(SOCKET_PORT);
 
 const server = app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);

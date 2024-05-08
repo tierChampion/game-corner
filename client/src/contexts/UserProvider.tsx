@@ -22,12 +22,8 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         return userId;
     }
 
-    const [state, dispatch] = useReducer(reducer, { userId: initializeId(), roomId: "", isHost: false });
+    const [state, dispatch] = useReducer(reducer, { userId: initializeId(), roomId: "" });
     const api = new HTTPManager();
-
-    useEffect(() => {
-
-    }, []);
 
     return (
         <UserContext.Provider value={{ state, dispatch, api }}>
