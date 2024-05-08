@@ -1,23 +1,27 @@
 import WebSocket from "ws";
 import RoomService from "../services/Rooms.service";
 
+interface UserInformation {
+    userId: string;
+    roomId: string;
+}
+
 class ServerWebSocket {
 
     private wss: WebSocket.Server;
     private roomService: RoomService;
     private heartbeatMap: Map<WebSocket, boolean>;
-    private userMap: Map<WebSocket, string>;
+    private userInfoMap: Map<WebSocket, UserInformation>;
     private roomMap: Map<string, WebSocket[]>;
 
     constructor(port: number) {
         this.wss = new WebSocket.Server({ port: port });
         this.roomService = new RoomService();
         this.heartbeatMap = new Map();
-        this.userMap = new Map();
+        this.userInfoMap = new Map();
         this.roomMap = new Map();
 
         this.wss.on("connection", (ws, req) => {
-            // handle the connection criteria (if it is valid)
             this.heartbeatMap.set(ws, true);
 
             ws.on("message", (message) => {
@@ -30,16 +34,16 @@ class ServerWebSocket {
             });
 
             ws.on("close", () => {
-                // this.broadcastUpdate(..., "updateRoom");
+                console.log("closed!");
+                this.close(ws);
             });
         });
 
         const heartBeatRoutine = setInterval(() => {
             this.wss.clients.forEach((ws) => {
                 if (!this.heartbeatMap.get(ws)) {
-                    // remove player from room
-                    console.log("removed from room!");
-                    return ws.terminate();
+                    console.log("user quit!");
+                    return ws.close();
                 }
                 this.heartbeatMap.set(ws, false);
                 ws.ping();
@@ -52,14 +56,7 @@ class ServerWebSocket {
         console.log("New command: ", command);
         switch (command.action) {
             case "connect":
-                this.roomService.addPlayer(command.roomId, command.userId);
-                this.userMap.set(ws, command.userId);
-                const wsInRoom = this.roomMap.get(command.roomId) || [];
-                wsInRoom.push(ws);
-                this.roomMap.set(command.roomId,
-                    wsInRoom);
-                // specify the room todo
-                this.broadcastToRoom(command.roomId, "updateMembers");
+                this.connection(ws, command.roomId, command.userId);
                 break;
             case "startGame":
                 this.broadcastToRoom(command.roomId, "startGame");
@@ -68,10 +65,38 @@ class ServerWebSocket {
         }
     }
 
-    broadcastToRoom(roomId: string, message: string) {
+    async connection(ws: WebSocket, roomId: string, userId: string) {
+        await this.roomService.addPlayer(roomId, userId);
+        const userInformation = { userId: userId, roomId: roomId };
+        this.userInfoMap.set(ws, userInformation);
+        const wsInRoom = this.roomMap.get(roomId) || [];
+        wsInRoom.push(ws);
+        this.roomMap.set(roomId,
+            wsInRoom);
+        // specify the room todo
+        this.broadcastToRoom(roomId, "updateMembers");
+    }
+
+    async close(ws: WebSocket) {
+        this.heartbeatMap.delete(ws);
+        const userInfo = this.userInfoMap.get(ws);
+        if (userInfo !== undefined) {
+            const newRoom = this.roomMap.get(userInfo.roomId)?.filter((userWs) => userWs !== ws);
+            if (newRoom !== undefined) {
+                this.roomMap.set(userInfo.roomId,
+                    newRoom);
+            }
+            await this.roomService.removePlayer(userInfo.roomId, userInfo.userId);
+            this.broadcastToRoom(userInfo.roomId, "updateRoom");
+            this.userInfoMap.delete(ws);
+        }
+    }
+
+    broadcastToRoom(roomId: string, action: string, params?: any) {
         const room = this.roomMap.get(roomId) || [];
         room.forEach((ws) => {
-            ws.send(message);
+            const command = {action: action};
+            ws.send(JSON.stringify(command));
         });
     }
 }

@@ -16,16 +16,36 @@ const JoinPage: React.FC = () => {
         roomsFetch();
     }, []);
 
-    return (
-        <>
-            {rooms.map((room: Room, index) => (
-                <Link to={`/room/${room.id}`} key={index}>
-                    <p>
-                        {room.id}
-                    </p>
-                </Link>))}
-        </>
-    );
+    if (rooms.length > 0) {
+        return (
+            <>
+                {rooms.map((room: Room, index) => (
+                    <Link to={`/room/${room.id}`} key={index}>
+                        <p>
+                            {room.id}
+                        </p>
+                    </Link>))
+                }
+                <Link to="/">
+                    <button>
+                        Go back to Home page
+                    </button>
+                </Link>
+            </>
+        );
+    }
+    else {
+        return (
+            <>
+                <div>There are no rooms for now!</div>
+                <Link to="/">
+                    <button>
+                        Go back to Home page
+                    </button>
+                </Link>
+            </>
+        );
+    }
 };
 
 export default JoinPage;

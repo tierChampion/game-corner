@@ -47,13 +47,15 @@ class RoomService {
     async removePlayer(roomId: string, playerId: string) {
         let wasModified = false;
         let rooms = await this.getAllRooms();
-        rooms = rooms.map((room: Room) => {
+        rooms = rooms.filter((room: Room) => {
             if (room.id === roomId) {
                 let length = room.members.length;
                 room.members = room.members.filter((id: string) => id !== playerId);
                 wasModified = room.members.length !== length;
             }
-            return room;
+            if (room.members.length !== 0) {
+                return room;
+            }
         });
         await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
         return wasModified;
