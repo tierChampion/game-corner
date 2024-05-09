@@ -25,7 +25,6 @@ class ServerWebSocket {
             this.heartbeatMap.set(ws, true);
 
             ws.on("message", (message) => {
-                // handle incoming information
                 this.handleCommand(ws, message);
             });
 
@@ -59,7 +58,10 @@ class ServerWebSocket {
                 this.connection(ws, command.roomId, command.userId);
                 break;
             case "startGame":
-                this.broadcastToRoom(command.roomId, "startGame");
+                this.startGame(command.roomId);
+                break;
+            case "endGame":
+                this.endGame(command.roomId);
                 break;
             default:
         }
@@ -75,6 +77,16 @@ class ServerWebSocket {
             wsInRoom);
         // specify the room todo
         this.broadcastToRoom(roomId, "updateMembers");
+    }
+
+    async startGame(roomId: string) {
+        const status = (await this.roomService.getRoom(roomId)).members.length === 2;
+        // needs to be 2 in the room
+        this.broadcastToRoom(roomId, "startGame", {status: status ? "success" : "failed"});
+    }
+
+    endGame(roomId: string) {
+        this.broadcastToRoom(roomId, "endGame");
     }
 
     async close(ws: WebSocket) {
@@ -94,8 +106,11 @@ class ServerWebSocket {
 
     broadcastToRoom(roomId: string, action: string, params?: any) {
         const room = this.roomMap.get(roomId) || [];
+        let command = { action: action, params: undefined };
+        if (params) {
+            command.params = params;
+        }
         room.forEach((ws) => {
-            const command = {action: action};
             ws.send(JSON.stringify(command));
         });
     }

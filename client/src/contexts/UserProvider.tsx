@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useReducer, useState } from "react";
+import React, { ReactNode, useReducer } from "react";
 import UserContext from "./UserContext";
 import { SESSION_STORAGE_ID_KEY } from "../env";
 import HTTPManager from "../utils/HTTPManager";

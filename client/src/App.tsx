@@ -4,6 +4,7 @@ import JoinPage from './pages/JoinPage';
 import RoomPage from './pages/RoomPage';
 import GamePage from './pages/GamePage';
 import UserProvider from './contexts/UserProvider';
+import RoomProvider from './contexts/RoomProvider';
 
 const App: React.FC = () => {
   const routes = [
@@ -16,11 +17,14 @@ const App: React.FC = () => {
   return (
     <>
       <UserProvider>
-        <Routes>
-          {routes.map((route, index) => {
-            return <Route key={index} path={route.path} element={route.element} />
-          })}
-        </Routes>
+        <RoomProvider>
+          <Routes>
+            <Route path={"/"} element={<HomePage />} />
+            <Route path={"/join"} element={<JoinPage />} />
+            <Route path={"/room/:roomId"} element={<RoomPage />} />
+            <Route path={"/game/:roomId"} element={<GamePage />} />
+          </Routes>
+        </RoomProvider>
       </UserProvider>
     </>
   );
