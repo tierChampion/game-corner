@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
-import { ActionType } from "../reducers/UserReducer";
+import { UserActionType } from "../reducers/UserReducer";
 import { useRoomContext } from "../contexts/RoomContext";
 
 const RoomPage: React.FC = () => {
@@ -13,7 +13,7 @@ const RoomPage: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        dispatch({ type: ActionType.JOIN_ROOM, payload: { roomId: params.roomId } })
+        dispatch({ type: UserActionType.JOIN_ROOM, payload: { roomId: params.roomId } })
         ws.initialise(state.userId, params.roomId || "", navigate);
     }, []);
 

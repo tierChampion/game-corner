@@ -1,8 +1,11 @@
 import { createContext, useContext } from "react";
 import ClientWebSocket from "../utils/Socket";
+import { RoomAction } from "../reducers/RoomReducer";
 
 export interface RoomData {
     ws: ClientWebSocket;
+    state: any;
+    dispatch: React.Dispatch<RoomAction>;
 }
 
 const RoomContext = createContext<RoomData | undefined>(undefined);

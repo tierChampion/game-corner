@@ -1,9 +1,9 @@
-export enum ActionType {
+export enum UserActionType {
     JOIN_ROOM = "joinRoom",
 }
  
-export interface Action {
-    type: ActionType;
+export interface UserAction {
+    type: UserActionType;
     payload?: any;
 }
  
@@ -12,10 +12,9 @@ interface UserReducerState {
     roomId: string;
 }
  
-export default function reducer(state: UserReducerState, action: Action) {
-
+export default function userReducer(state: UserReducerState, action: UserAction) {
     switch (action.type) {
-        case ActionType.JOIN_ROOM:
+        case UserActionType.JOIN_ROOM:
             return {
                 ...state,
                 roomId: action.payload.roomId,

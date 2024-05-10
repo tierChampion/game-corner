@@ -2,7 +2,7 @@ import React, { ReactNode, useReducer } from "react";
 import UserContext from "./UserContext";
 import { SESSION_STORAGE_ID_KEY } from "../env";
 import HTTPManager from "../utils/HTTPManager";
-import reducer from "../reducers/UserReducer";
+import userReducer from "../reducers/UserReducer";
 
 interface UserProviderProps {
     children: ReactNode;
@@ -22,7 +22,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         return userId;
     }
 
-    const [state, dispatch] = useReducer(reducer, { userId: initializeId(), roomId: "" });
+    const [state, dispatch] = useReducer(userReducer, { userId: initializeId(), roomId: "" });
     const api = new HTTPManager();
 
     return (

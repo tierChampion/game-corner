@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useRoomContext } from "../contexts/RoomContext";
 import { useEffect } from "react";
 import { useUserContext } from "../contexts/UserContext";
+import QuartoBoard from "../components/QuartoBoard";
 
 const GamePage: React.FC = () => {
 
@@ -16,9 +17,7 @@ const GamePage: React.FC = () => {
 
     return (
         <>
-            <div>
-                Game page
-            </div>
+            <QuartoBoard/>
             <Link to={`/room/${params.roomId}`}>
                 <button onClick={() => { ws.sendEndGame(); }}>
                     Leave game

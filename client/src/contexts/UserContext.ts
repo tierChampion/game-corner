@@ -1,10 +1,10 @@
 import { createContext, useContext } from "react";
 import HTTPManager from "../utils/HTTPManager";
-import { Action } from "../reducers/UserReducer";
+import { UserAction } from "../reducers/UserReducer";
 
 export interface UserData {
     state: any;
-    dispatch: React.Dispatch<Action>;
+    dispatch: React.Dispatch<UserAction>;
     api: HTTPManager;
 }
 
