@@ -4,17 +4,16 @@ import "../styles/Quarto.css";
 import { useRoomContext } from "../contexts/RoomContext";
 import { RoomActionType } from "../reducers/RoomReducer";
 
+export interface QuartoProps {
+    pieces: QuartoPieceData[];
+}
+
 const QuartoBoard: React.FC = () => {
 
     const { state, dispatch } = useRoomContext();
-    const [pieces, setPieces] = useState<QuartoPieceData[]>(state.board);
 
     const placePiece = (index: number) => {
-        if (!state.board[index].isValid && state.selectedPiece !== -1) {
-            dispatch({ type: RoomActionType.PLACE_PIECE, payload: { index: index } });
-            console.log(state.board);
-            setPieces(state.board);
-        }
+        dispatch({ type: RoomActionType.PLACE_PIECE, payload: { index: index } });
     };
 
     return (

@@ -17,7 +17,7 @@ const GamePage: React.FC = () => {
 
     return (
         <>
-            <QuartoBoard/>
+            {/* <QuartoBoard/> */}
             <Link to={`/room/${params.roomId}`}>
                 <button onClick={() => { ws.sendEndGame(); }}>
                     Leave game

@@ -6,7 +6,7 @@
     width: 250px;
     height: 250px;
     border-radius: 10%;
-    border: 2px solid var(--wood-color);
+    border: 3px solid var(--wood-color);
     background-color: black;
     display: flex;
     align-items: center;
@@ -51,7 +51,7 @@
 .bank {
     width: 60px;
     height: 240px;
-    border: 2px solid var(--wood-color);
+    border: 3px solid var(--wood-color);
     background-color: black;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -63,10 +63,17 @@
 .bank-square {
     width: 100%;
     height: 100%;
+    border-radius: 100%;
     /* border: 1px solid var(--wood-color); */
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.bank-square.selected {
+    border-radius: 100%;
+    /* border: 1px solid var(--wood-color); */
+    background-color: var(--wood-color);
 }
 
 .piece {
