@@ -1,23 +1,20 @@
+import "../styles/Quarto.css"
 import QuartoPiece, { QuartoPieceData } from "./QuartoPiece";
-import RoomContext, { useRoomContext } from "../contexts/RoomContext";
-import { RoomActionType } from "../reducers/RoomReducer";
-import { QuartoProps } from "./QuartoBoard";
+import useQuartoStore from "../stores/QuartoStore";
 
 const QuartoPieceBank: React.FC = () => {
 
-    const { state, dispatch } = useRoomContext();
-
-    const selectPiece = (index: number) => {
-        dispatch({ type: RoomActionType.SELECT_PIECE, payload: { selectedPiece: index } });
-    }
+    const bank = useQuartoStore((state) => state.bank);
+    const selectedPiece = useQuartoStore((state) => state.selectedPiece);
+    const setSelectedPiece = useQuartoStore((state) => state.setSelectedPiece);
 
     return (
         <div className="bank">
-            {state.bank.map((piece: QuartoPieceData, index: number) => {
+            {bank.map((piece: QuartoPieceData, index: number) => {
                 return (
                     <div key={`bank-square-${index}`} 
-                    className={"bank-square" + (state.selectedPiece === index ? " selected" : "")} 
-                    onClick={() => selectPiece(index)}>
+                    className={"bank-square" + (selectedPiece === index ? " selected" : "")} 
+                    onClick={() => setSelectedPiece((selectedPiece !== index) ? index : -1)}>
                         <QuartoPiece key={`bank-piece-${index}`} {...piece} />
                     </div>
                 )

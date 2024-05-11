@@ -1,26 +1,33 @@
-import { useEffect, useState } from "react";
-import QuartoPiece, { QuartoPieceData } from "./QuartoPiece";
 import "../styles/Quarto.css";
-import { useRoomContext } from "../contexts/RoomContext";
-import { RoomActionType } from "../reducers/RoomReducer";
-
-export interface QuartoProps {
-    pieces: QuartoPieceData[];
-}
+import QuartoPiece, { QuartoPieceData } from "./QuartoPiece";
+import useQuartoStore from "../stores/QuartoStore";
 
 const QuartoBoard: React.FC = () => {
 
-    const { state, dispatch } = useRoomContext();
+    const board = useQuartoStore((state) => state.board);
+    const bank = useQuartoStore((state) => state.bank);
+    const selectedPiece = useQuartoStore((state) => state.selectedPiece);
+    const setBoard = useQuartoStore((state) => state.setBoard);
+    const setBank = useQuartoStore((state) => state.setBank);
+    const setSelectedPiece = useQuartoStore((state) => state.setSelectedPiece);
 
     const placePiece = (index: number) => {
-        dispatch({ type: RoomActionType.PLACE_PIECE, payload: { index: index } });
+        if (!board[index].isValid && selectedPiece !== -1) {
+            const newBoard = [...board];
+            const newBank = [...bank];
+            newBoard[index] = { ...newBank[selectedPiece] };
+            newBank[selectedPiece].isValid = false;
+            setBoard(newBoard);
+            setBank(newBank);
+            setSelectedPiece(-1);
+        }
     };
 
     return (
         <div className="board">
             <div className="ring">
                 <div className="play-board">
-                    {state.board.map((piece: QuartoPieceData, index: number) => {
+                    {board.map((piece: QuartoPieceData, index: number) => {
                         return (
                             <div
                                 key={`board-square-${index}`}
