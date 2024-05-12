@@ -10,26 +10,19 @@ class ServerWebSocket {
 
     private wss: WebSocket.Server;
     private roomService: RoomService;
-    private heartbeatMap: Map<WebSocket, boolean>;
     private userInfoMap: Map<WebSocket, UserInformation>;
-    private roomMap: Map<string, WebSocket[]>;
+    private userMap: Map<string, WebSocket>;
 
     constructor(port: number) {
         this.wss = new WebSocket.Server({ port: port });
         this.roomService = new RoomService();
-        this.heartbeatMap = new Map();
         this.userInfoMap = new Map();
-        this.roomMap = new Map();
+        this.userMap = new Map();
 
         this.wss.on("connection", (ws, req) => {
-            this.heartbeatMap.set(ws, true);
 
             ws.on("message", (message) => {
                 this.handleCommand(ws, message);
-            });
-
-            ws.on("pong", () => {
-                this.heartbeatMap.set(ws, true);
             });
 
             ws.on("close", () => {
@@ -37,17 +30,6 @@ class ServerWebSocket {
                 this.close(ws);
             });
         });
-
-        const heartBeatRoutine = setInterval(() => {
-            this.wss.clients.forEach((ws) => {
-                if (!this.heartbeatMap.get(ws)) {
-                    console.log("user quit!");
-                    return ws.close();
-                }
-                this.heartbeatMap.set(ws, false);
-                ws.ping();
-            });
-        }, 10000);
     }
 
     handleCommand(ws: WebSocket, message: WebSocket.RawData) {
@@ -63,54 +45,72 @@ class ServerWebSocket {
             case "endGame":
                 this.endGame(command.roomId);
                 break;
+            case "move":
+                this.moveGame(command.roomId, command.selectedPiece, command.boardSquare);
+                break;
             default:
         }
     }
 
+    async getRoomWS(roomId: string) {
+        const room = (await this.roomService.getRoom(roomId))?.members || [];
+        return room.map((userId: string) => {
+            return this.userMap.get(userId);
+        });
+    }
+
     async connection(ws: WebSocket, roomId: string, userId: string) {
-        await this.roomService.addPlayer(roomId, userId);
-        const userInformation = { userId: userId, roomId: roomId };
-        this.userInfoMap.set(ws, userInformation);
-        const wsInRoom = this.roomMap.get(roomId) || [];
-        wsInRoom.push(ws);
-        this.roomMap.set(roomId,
-            wsInRoom);
-        // specify the room todo
-        this.broadcastToRoom(roomId, "updateMembers");
+        if (this.userMap.get(userId) === undefined) {
+            await this.roomService.addPlayer(roomId, userId);
+            const userInformation = { userId: userId, roomId: roomId };
+            this.userInfoMap.set(ws, userInformation);
+            this.userMap.set(userId, ws);
+        } else {
+            const old = this.userMap.get(userId)!;
+            const userInfo = this.userInfoMap.get(old)!;
+            this.userInfoMap.set(ws, userInfo);
+            this.userInfoMap.delete(old);
+            this.userMap.set(userId, ws);
+        }
     }
 
     async startGame(roomId: string) {
-        const status = (await this.roomService.getRoom(roomId)).members.length === 2;
+        const room = await this.roomService.getRoom(roomId);
+        const status = room.members?.length === 2;
         // needs to be 2 in the room
-        this.broadcastToRoom(roomId, "startGame", {status: status ? "success" : "failed"});
+        this.broadcastToRoom(roomId, "startGame",
+            {
+                status: status ? "success" : "failed",
+                start: room.members[Math.floor(Math.random() * room.members.length)]
+            });
     }
 
     endGame(roomId: string) {
         this.broadcastToRoom(roomId, "endGame");
     }
 
+    moveGame(roomId: string, selectedPiece: number, boardSquare: number) {
+        this.broadcastToRoom(roomId, "move",
+            { selectedPiece: selectedPiece, boardSquare: boardSquare });
+    }
+
     async close(ws: WebSocket) {
-        this.heartbeatMap.delete(ws);
         const userInfo = this.userInfoMap.get(ws);
         if (userInfo !== undefined) {
-            const newRoom = this.roomMap.get(userInfo.roomId)?.filter((userWs) => userWs !== ws);
-            if (newRoom !== undefined) {
-                this.roomMap.set(userInfo.roomId,
-                    newRoom);
-            }
-            await this.roomService.removePlayer(userInfo.roomId, userInfo.userId);
-            this.broadcastToRoom(userInfo.roomId, "updateRoom");
+            console.log("okkk");
             this.userInfoMap.delete(ws);
+            this.userMap.delete(userInfo.userId);
+            await this.roomService.removePlayer(userInfo.roomId, userInfo.userId);
         }
     }
 
-    broadcastToRoom(roomId: string, action: string, params?: any) {
-        const room = this.roomMap.get(roomId) || [];
+    async broadcastToRoom(roomId: string, action: string, params?: any) {
+        const room = await this.getRoomWS(roomId);
         let command = { action: action, params: undefined };
         if (params) {
             command.params = params;
         }
-        room.forEach((ws) => {
+        room.forEach((ws: WebSocket) => {
             ws.send(JSON.stringify(command));
         });
     }

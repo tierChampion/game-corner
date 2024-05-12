@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import RoomCreationButton from "../components/RoomCreation";
+import RoomCreationButton from "../components/RoomCreationButton";
 import useGlobalStore from "../stores/GlobalStore";
 
 const HomePage: React.FC = () => {

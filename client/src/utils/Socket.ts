@@ -4,15 +4,20 @@ import { SERVER_SOCKET_URL } from "../env";
 class ClientWebSocket {
 
     private ws: WebSocket;
-    private opened: boolean;
     private userId: string;
     private roomId: string;
+    private lastCommand: any;
+    private gameStartAction: (command: any) => void;
+    private moveAction: (command: any) => void;
 
     constructor() {
 
-        this.opened = false;
         this.userId = "";
         this.roomId = "";
+        this.lastCommand = { action: "", params: undefined };
+
+        this.gameStartAction = () => {console.error("Erorr, this event was not setup.")};
+        this.moveAction = () => {console.error("Erorr, this event was not setup.")};
 
         this.ws = new WebSocket(SERVER_SOCKET_URL);
     }
@@ -23,7 +28,6 @@ class ClientWebSocket {
 
         this.ws = new WebSocket(SERVER_SOCKET_URL);
         this.ws.onopen = () => {
-            this.opened = true;
             this.sendConnect();
         }
         this.ws.onmessage = (event) => {
@@ -42,18 +46,27 @@ class ClientWebSocket {
     }
 
     sendEndGame() {
-        const endGame = { action: "endGame", roomId: this.roomId };
-        this.ws.send(JSON.stringify(endGame));
+        const endGameCommand = { action: "endGame", roomId: this.roomId };
+        this.ws.send(JSON.stringify(endGameCommand));
+    }
+
+    sendMove(selectedPiece: number, boardSquare: number) {
+        const moveCommand = {
+            action: "move",
+            roomId: this.roomId,
+            selectedPiece: selectedPiece,
+            boardSquare: boardSquare
+        };
+        this.ws.send(JSON.stringify(moveCommand));
     }
 
     handleMessage(event: MessageEvent<any>, navigate: NavigateFunction) {
 
         const command = JSON.parse(event.data);
         switch (command.action) {
-            case "updateMembers":
-                break;
             case "startGame":
                 if (command.params.status === "success") {
+                    this.gameStartAction(command);
                     navigate(`../game/${this.roomId}`);
                 } else {
                     console.error("Error: unable to start the game.");
@@ -62,13 +75,28 @@ class ClientWebSocket {
             case "endGame":
                 navigate(`../room/${this.roomId}`);
                 break;
+            case "move":
+                this.moveAction(command);
+                break;
             default:
         }
+        this.lastCommand = command;
     }
 
     close() {
         this.ws.close();
-        this.opened = false;
+    }
+
+    getLastCommand() {
+        return this.lastCommand;
+    }
+
+    setGameStartAction(action: (command: any) => void) {
+        this.gameStartAction = action;
+    }
+
+    setMoveAction(action: (command: any) => void) {
+        this.moveAction = action;
     }
 }
 

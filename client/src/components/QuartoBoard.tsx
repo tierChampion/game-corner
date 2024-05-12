@@ -1,9 +1,12 @@
 import "../styles/Quarto.css";
 import QuartoPiece, { QuartoPieceData } from "./QuartoPiece";
 import useQuartoStore from "../stores/QuartoStore";
+import useRoomStore from "../stores/RoomStore";
 
 const QuartoBoard: React.FC = () => {
 
+    const ws = useRoomStore((state) => state.ws);
+    const turn = useQuartoStore((state) => state.turn);
     const board = useQuartoStore((state) => state.board);
     const bank = useQuartoStore((state) => state.bank);
     const selectedPiece = useQuartoStore((state) => state.selectedPiece);
@@ -13,6 +16,7 @@ const QuartoBoard: React.FC = () => {
 
     const placePiece = (index: number) => {
         if (!board[index].isValid && selectedPiece !== -1) {
+            const piece = selectedPiece;
             const newBoard = [...board];
             const newBank = [...bank];
             newBoard[index] = { ...newBank[selectedPiece] };
@@ -20,6 +24,10 @@ const QuartoBoard: React.FC = () => {
             setBoard(newBoard);
             setBank(newBank);
             setSelectedPiece(-1);
+            if (turn) {
+                ws.sendMove(piece, index);
+                console.log("sent the move!");
+            }
         }
     };
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Room } from "../components/RoomCreation";
+import { Room } from "../components/RoomCreationButton";
 import useGlobalStore from "../stores/GlobalStore";
 
 const JoinPage: React.FC = () => {
