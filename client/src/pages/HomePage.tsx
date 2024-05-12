@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
-import UserContext, { useUserContext } from "../contexts/UserContext";
-import { useContext } from "react";
 import RoomCreationButton from "../components/RoomCreation";
+import useGlobalStore from "../stores/GlobalStore";
 
 const HomePage: React.FC = () => {
-    const state = useUserContext().state;
+    const userId = useGlobalStore((state) => state.userId);
 
     return (
         <>
@@ -16,7 +15,7 @@ const HomePage: React.FC = () => {
                 </button>
             </Link>
             <p>
-                id: {state.userId}
+                id: {userId}
             </p>
         </>
     );

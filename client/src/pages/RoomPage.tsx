@@ -1,20 +1,21 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useUserContext } from "../contexts/UserContext";
-import { UserActionType } from "../reducers/UserReducer";
-import { useRoomContext } from "../contexts/RoomContext";
+import useRoomStore from "../stores/RoomStore";
+import useGlobalStore from "../stores/GlobalStore";
 
 const RoomPage: React.FC = () => {
 
-    const { state, dispatch, api } = useUserContext();
-    const ws = useRoomContext().ws;
+    const userId = useGlobalStore((state) => state.userId);
+    const setRoomId = useRoomStore((state) => state.setRoomId);
+    const ws = useRoomStore((state) => state.ws);
     const [ready, setReady] = useState<boolean>(false);
     const params = useParams();
+    const roomId = params.roomId || "";
     const navigate = useNavigate();
 
     useEffect(() => {
-        dispatch({ type: UserActionType.JOIN_ROOM, payload: { roomId: params.roomId } })
-        ws.initialise(state.userId, params.roomId || "", navigate);
+        setRoomId(roomId);
+        ws.initialise(userId, params.roomId || "", navigate);
     }, []);
 
 

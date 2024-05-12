@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useUserContext } from "../contexts/UserContext";
 import { Room } from "../components/RoomCreation";
+import useGlobalStore from "../stores/GlobalStore";
 
 const JoinPage: React.FC = () => {
 
-    const api = useUserContext().api;
+    const api = useGlobalStore((state) => state.api);
 
     const [rooms, setRooms] = useState([]);
 
     useEffect(() => {
         const roomsFetch = async () => {
-            setRooms(await api.getAllRooms());
+            try {
+                setRooms(await api.getAllRooms());
+            } catch (err) {
+                setRooms([]);
+                console.error("Error when connecting to server, could not get rooms.");
+            }
         }
         roomsFetch();
     }, []);

@@ -1,24 +1,24 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useRoomContext } from "../contexts/RoomContext";
 import { useEffect } from "react";
-import { useUserContext } from "../contexts/UserContext";
-import QuartoBoard from "../components/QuartoBoard";
+import useRoomStore from "../stores/RoomStore";
+import useGlobalStore from "../stores/GlobalStore";
+import QuartoGame from "../components/QuartoGame";
 
 const GamePage: React.FC = () => {
 
-    const state = useUserContext().state;
-    const ws = useRoomContext().ws;
-    const params = useParams();
+    const userId = useGlobalStore((state) => state.userId);
+    const roomId = useRoomStore((state) => state.roomId);
+    const ws = useRoomStore((state) => state.ws);
     const navigate = useNavigate();
 
     useEffect(() => {
-        ws.initialise(state.userId, params.roomId || "", navigate);
+        ws.initialise(userId, roomId || "", navigate);
     }, []);
 
     return (
         <>
-            {/* <QuartoBoard/> */}
-            <Link to={`/room/${params.roomId}`}>
+            <QuartoGame/>
+            <Link to={`/room/${roomId}`}>
                 <button onClick={() => { ws.sendEndGame(); }}>
                     Leave game
                 </button>
