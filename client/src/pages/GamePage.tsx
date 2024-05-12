@@ -10,6 +10,7 @@ const GamePage: React.FC = () => {
     const userId = useGlobalStore((state) => state.userId);
     const roomId = useRoomStore((state) => state.roomId);
     const ws = useRoomStore((state) => state.ws);
+    const gameState = useQuartoStore((state) => state.gameState);
     const turn = useQuartoStore((state) => state.turn);
     const setTurn = useQuartoStore((state) => state.setTurn);
     const executeMove = useQuartoStore((state) => state.executeMove);
@@ -29,6 +30,9 @@ const GamePage: React.FC = () => {
         <>
             <QuartoGame />
             {turn && <div>Your turn.</div>}
+            {gameState === "winner" && <div>You won!</div>}
+            {gameState === "loser" && <div>You lost!</div>}
+            {gameState === "draw" && <div>Game drawn!</div>}
             <Link to={`/room/${roomId}`}>
                 <button onClick={() => { ws.sendEndGame(); }}>
                     Leave game

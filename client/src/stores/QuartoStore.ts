@@ -2,17 +2,16 @@ import { create } from "zustand";
 import { QuartoPieceData } from "../components/QuartoPiece";
 
 interface QuartoState {
-    winner: string;
+    gameState: string;
     turn: boolean;
     selectedPiece: number;
     board: QuartoPieceData[];
     bank: QuartoPieceData[];
-    setWinner: (newWinner: string) => void;
     setSelectedPiece: (newSelectedPiece: number) => void;
     setBoard: (newBoard: QuartoPieceData[]) => void;
     setBank: (newBank: QuartoPieceData[]) => void;
     setTurn: (newTurn: boolean) => void;
-    startGame: (userId:string, command: any) => void;
+    startGame: (userId: string, command: any) => void;
     executeMove: (command: any) => void;
 }
 
@@ -44,15 +43,73 @@ const getInitialBank = () => {
     return bank;
 };
 
+// this doesnt work
+const analyseBoardState = (board: QuartoPieceData[]) => {
+    console.log(board);
+    for (let i = 0; i < 4; i++) {
+        const first = board[i * 5];
+        if (first.isValid) {
+            for (let d = 0; d < 2; d++) {
+                let matches = [true, true, true, true];
+                for (let j = 0; j < 4; j++) {
+                    const index = d === 0 ? i * 4 + j : j * 4 + i;
+                    const other = board[index];
+                    if (other === first) continue;
+                    if (!other.isValid) {
+                        matches[0] = false;
+                        matches[1] = false;
+                        matches[2] = false;
+                        matches[3] = false;
+                        break;
+                    }
+                    matches[0] = matches[0] && (other.isBlack === first.isBlack);
+                    matches[1] = matches[1] && (other.isSquare === first.isSquare);
+                    matches[2] = matches[2] && (other.isTall === first.isTall);
+                    matches[3] = matches[3] && (other.hasHole === first.hasHole);
+                }
+                if (matches[0] || matches[1] || matches[2] || matches[3]) return "win";
+            }
+        }
+    }
+
+    for (let d = 0; d < 2; d++) {
+        const first = board[d * 3];
+        if (first.isValid) {
+            let winning = true;
+            let matches = [true, true, true, true];
+            for (let i = 1; i < 4; i++) {
+                const index = (d === 0) ? 5 * i : 3 * (i + 1);
+                const other = board[index];
+                if (!other.isValid) {
+                    matches[0] = false;
+                    matches[1] = false;
+                    matches[2] = false;
+                    matches[3] = false;
+                    break;
+                }
+                matches[0] = matches[0] && (other.isBlack === first.isBlack);
+                matches[1] = matches[1] && (other.isSquare === first.isSquare);
+                matches[2] = matches[2] && (other.isTall === first.isTall);
+                matches[3] = matches[3] && (other.hasHole === first.hasHole);
+            }
+            if (matches[0] || matches[1] || matches[2] || matches[3]) return "win";
+        }
+    }
+
+    let validCount = 0;
+    for (let i = 0; i < 4 * 4; i++) {
+        validCount += board[i].isValid === true ? 1 : 0;
+    }
+
+    return validCount === 16 ? "draw" : "";
+}
+
 const useQuartoStore = create<QuartoState>()((set) => ({
-    winner: "",
+    gameState: "",
     turn: false,
     selectedPiece: -1,
     board: getInitialBoard(),
     bank: getInitialBank(),
-    setWinner: (newWinner: string) => set(() => { 
-        return { winner: newWinner }; 
-    }),
     setSelectedPiece: (newSelectedPiece: number) => set((state) => {
         const newValue = state.turn ? newSelectedPiece : state.selectedPiece;
         return { selectedPiece: newValue };
@@ -67,19 +124,36 @@ const useQuartoStore = create<QuartoState>()((set) => ({
     }),
     setTurn: (newTurn) => set(() => ({ turn: newTurn })),
     startGame: (userId: string, command: any) => set((state) => {
-        return {board: getInitialBoard(), 
-            bank: getInitialBank(), 
-            selectedPiece: -1, 
+        return {
+            gameState: "",
+            board: getInitialBoard(),
+            bank: getInitialBank(),
+            selectedPiece: -1,
             turn: command.params.start === userId,
         };
     }),
     executeMove: (command: any) => set((state) => {
-        if (state.turn) return { turn: !state.turn };
         const newBoard = [...state.board];
         const newBank = [...state.bank];
         newBoard[command.params.boardSquare] = { ...newBank[command.params.selectedPiece] };
         newBank[command.params.selectedPiece].isValid = false;
-        return { board: newBoard, bank: newBank, selectedPiece: -1, turn: !state.turn };
+        let newTurn = !state.turn;
+
+        const boardState = analyseBoardState(state.turn ? state.board : newBoard);
+        let newGameState = "";
+        if (boardState === "win") {
+            newGameState = state.turn ? "winner" : "loser";
+            newTurn = false;
+        } else if (boardState === "draw") {
+            newGameState = "draw";
+            newTurn = false;
+        }
+
+        if (state.turn) return { gameState: newGameState, turn: newTurn };
+        return {
+            gameState: newGameState, board: newBoard, bank: newBank,
+            selectedPiece: -1, turn: newTurn
+        };
     }),
 }));
 
