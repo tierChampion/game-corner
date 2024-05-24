@@ -39,24 +39,28 @@ class ServerWebSocket {
             case "connect":
                 this.connection(ws, command.roomId, command.userId);
                 break;
-            case "startGame":
+            case "start":
                 this.startGame(command.roomId);
                 break;
-            case "endGame":
+            case "end":
                 this.endGame(command.roomId);
                 break;
             case "move":
-                this.moveGame(command.roomId, command.selectedPiece, command.boardSquare);
+                this.moveGame(command.roomId, command.userId, command.move);
                 break;
             default:
         }
     }
 
-    async getRoomWS(roomId: string) {
+    async getRoomWS(roomId: string, userId: string) {
         const room = (await this.roomService.getRoom(roomId))?.members || [];
-        return room.map((userId: string) => {
-            return this.userMap.get(userId);
+        const sockets: WebSocket[] = [];
+        room.forEach((id: string) => {
+            if (id !== userId) {
+                sockets.push(this.userMap.get(id)!);
+            }
         });
+        return sockets;
     }
 
     async connection(ws: WebSocket, roomId: string, userId: string) {
@@ -72,46 +76,49 @@ class ServerWebSocket {
             this.userInfoMap.delete(old);
             this.userMap.set(userId, ws);
         }
+        await this.broadcastToRoom(roomId, "", "members");
     }
 
     async startGame(roomId: string) {
         const room = await this.roomService.getRoom(roomId);
-        const status = room.members?.length === 2;
+        const valid = room.members?.length === 2;
         // needs to be 2 in the room
-        this.broadcastToRoom(roomId, "startGame",
+        await this.broadcastToRoom(roomId, "", "start",
             {
-                status: status ? "success" : "failed",
+                isValid: valid,
                 start: room.members[Math.floor(Math.random() * room.members.length)]
             });
     }
 
-    endGame(roomId: string) {
-        this.broadcastToRoom(roomId, "endGame");
+    async endGame(roomId: string) {
+        await this.broadcastToRoom(roomId, "", "end");
     }
 
-    moveGame(roomId: string, selectedPiece: number, boardSquare: number) {
-        this.broadcastToRoom(roomId, "move",
-            { selectedPiece: selectedPiece, boardSquare: boardSquare });
+    async moveGame(roomId: string, userId: string, move: number) {
+        await this.broadcastToRoom(roomId, userId, "move",
+            { move: move });
     }
 
     async close(ws: WebSocket) {
         const userInfo = this.userInfoMap.get(ws);
         if (userInfo !== undefined) {
-            console.log("okkk");
             this.userInfoMap.delete(ws);
             this.userMap.delete(userInfo.userId);
             await this.roomService.removePlayer(userInfo.roomId, userInfo.userId);
+            await this.broadcastToRoom(userInfo.roomId, "", "members");
         }
     }
 
-    async broadcastToRoom(roomId: string, action: string, params?: any) {
-        const room = await this.getRoomWS(roomId);
+    async broadcastToRoom(roomId: string, userId: string, action: string, params?: any) {
+        const room = await this.getRoomWS(roomId, userId);
         let command = { action: action, params: undefined };
         if (params) {
             command.params = params;
         }
         room.forEach((ws: WebSocket) => {
-            ws.send(JSON.stringify(command));
+            if (ws) {
+                ws.send(JSON.stringify(command));
+            }
         });
     }
 }

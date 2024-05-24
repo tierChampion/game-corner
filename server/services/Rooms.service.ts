@@ -1,4 +1,4 @@
-import FileSystemManager from "../utils/FileSystemManager.ts";
+import FileSystemManager from "../utils/FileSystemManager";
 
 const ROOMS_FILE = "data/rooms.json";
 
@@ -15,7 +15,12 @@ class RoomService {
     }
 
     async getAllRooms() {
-        return JSON.parse(await this.fsManager.readFile(ROOMS_FILE));
+        try {
+            return JSON.parse(await this.fsManager.readFile(ROOMS_FILE));
+        } catch (error) {
+            console.error("Error parsing the rooms:", error);
+            return [];
+        }
     }
 
     async getRoom(roomId: string) {
@@ -53,9 +58,11 @@ class RoomService {
                 room.members = room.members.filter((id: string) => id !== playerId);
                 wasModified = room.members.length !== length;
             }
-            if (room.members.length !== 0) {
-                return room;
-            }
+            // todo add a set timeout when the room is empty. 
+            // if in 10 seconds, it is still empty, destroy the room
+            // if (room.members.length !== 0) {
+            return room;
+            // }
         });
         await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
         return wasModified;

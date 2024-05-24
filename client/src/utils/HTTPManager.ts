@@ -46,6 +46,11 @@ export const HTTPInterface = {
   },
 };
 
+export interface Room {
+  id: string,
+  members: string[]
+}
+
 export default class HTTPManager {
   private roomEndpoint: string;
 
@@ -53,15 +58,15 @@ export default class HTTPManager {
       this.roomEndpoint = "rooms";
    }
 
-  async getAllRooms() {
+  async getAllRooms(): Promise<Room[]> {
     return await HTTPInterface.GET(this.roomEndpoint);
   }
 
-  async getRoom(roomId: string) {
+  async getRoom(roomId: string): Promise<Room> {
     return await HTTPInterface.GET(`${this.roomEndpoint}/${roomId}`);
   }
 
-  async createRoom() {
+  async createRoom(): Promise<Room> {
     return await HTTPInterface.POST(this.roomEndpoint, {});
   }
 }

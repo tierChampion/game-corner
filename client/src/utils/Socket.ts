@@ -16,8 +16,8 @@ class ClientWebSocket {
         this.roomId = "";
         this.lastCommand = { action: "", params: undefined };
 
-        this.gameStartAction = () => {console.error("Erorr, this event was not setup.")};
-        this.moveAction = () => {console.error("Erorr, this event was not setup.")};
+        this.gameStartAction = () => {console.error("Error, this event was not setup.")};
+        this.moveAction = () => {console.error("Error, this event was not setup.")};
 
         this.ws = new WebSocket(SERVER_SOCKET_URL);
     }

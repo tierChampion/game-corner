@@ -1,7 +1,6 @@
-import { HTTP_STATUS } from "../utils/Http.ts";
-import { Request, Response } from "express";
-import {Router} from "express";
-import RoomService from "../services/Rooms.service.ts";
+import { HTTP_STATUS } from "../utils/Http";
+import { Router, Request, Response } from "express";
+import RoomService from "../services/Rooms.service";
 
 const router = Router();
 const roomService = new RoomService();
@@ -15,7 +14,7 @@ router.get("/", async (req: Request, res: Response) => {
     }
 });
 
-router.get("/:roomId", async (req: Request , res: Response) => {
+router.get("/:roomId", async (req: Request, res: Response) => {
     try {
         const room = await roomService.getRoom(req.params.roomId);
         res.status(HTTP_STATUS.SUCCESS).json(room);

@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Room } from "../components/RoomCreationButton";
+import { Link, useNavigate } from "react-router-dom";
 import useGlobalStore from "../stores/GlobalStore";
+import { Room } from "../utils/HTTPManager";
+import useRoomStore from "../stores/RoomStore";
 
 const JoinPage: React.FC = () => {
-
     const api = useGlobalStore((state) => state.api);
-
-    const [rooms, setRooms] = useState([]);
+    const setRoomId = useRoomStore((state) => state.setRoomId);
+    const navigate = useNavigate();
+    const [rooms, setRooms] = useState<Room[]>([]);
 
     useEffect(() => {
         const roomsFetch = async () => {
@@ -21,15 +22,24 @@ const JoinPage: React.FC = () => {
         roomsFetch();
     }, []);
 
+    const joinRoom = (roomId: string) => {
+        const roomJoining = async (roomId: string) => {
+            setRoomId(roomId);
+            // navigate(`/room/${roomId}`);
+        }
+        roomJoining(roomId);
+    }
+
     if (rooms.length > 0) {
         return (
             <>
                 {rooms.map((room: Room, index) => (
-                    <Link to={`/room/${room.id}`} key={index}>
-                        <p>
+                    <Link key={index} to={`/room/${room.id}`}>
+                        <p onClick={() => joinRoom(room.id)}>
                             {room.id}
                         </p>
-                    </Link>))
+                    </Link>
+                ))
                 }
                 <Link to="/">
                     <button>

@@ -26,7 +26,6 @@ const QuartoBoard: React.FC = () => {
             setSelectedPiece(-1);
             if (turn) {
                 ws.sendMove(piece, index);
-                console.log("sent the move!");
             }
         }
     };

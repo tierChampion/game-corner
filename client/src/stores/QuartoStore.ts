@@ -123,7 +123,7 @@ const useQuartoStore = create<QuartoState>()((set) => ({
         return { bank: newValue };
     }),
     setTurn: (newTurn) => set(() => ({ turn: newTurn })),
-    startGame: (userId: string, command: any) => set((state) => {
+    startGame: (userId: string, command: any) => set(() => {
         return {
             gameState: "",
             board: getInitialBoard(),
@@ -136,6 +136,7 @@ const useQuartoStore = create<QuartoState>()((set) => ({
         const newBoard = [...state.board];
         const newBank = [...state.bank];
         newBoard[command.params.boardSquare] = { ...newBank[command.params.selectedPiece] };
+        console.log(command);
         newBank[command.params.selectedPiece].isValid = false;
         let newTurn = !state.turn;
 

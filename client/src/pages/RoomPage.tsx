@@ -1,49 +1,66 @@
-import { useEffect, useState, useMemo } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import useRoomStore from "../stores/RoomStore";
 import useGlobalStore from "../stores/GlobalStore";
 import useQuartoStore from "../stores/QuartoStore";
+import useTestWebSocket, { Command } from "../components/WebSocket";
+import { Room } from "../utils/HTTPManager";
 
 const RoomPage: React.FC = () => {
-
+    const api = useGlobalStore((state) => state.api);
     const userId = useGlobalStore((state) => state.userId);
-    const setRoomId = useRoomStore((state) => state.setRoomId);
-    const ws = useRoomStore((state) => state.ws);
+    const roomId = useRoomStore((state) => state.roomId);
+    const [members, setMembers] = useState<string[]>([]);
     const startGame = useQuartoStore((state) => state.startGame);
     const [ready, setReady] = useState<boolean>(false);
-    const params = useParams();
-    const roomId = params.roomId || "";
     const navigate = useNavigate();
 
-    const handleGameStart = (command: any) => {
-        startGame(userId, command);
-    };
+    const { sendJsonMessage, lastJsonMessage } = useTestWebSocket();
 
     useEffect(() => {
-        setRoomId(roomId);
-        ws.initialise(userId, params.roomId || "", navigate);
-        ws.setGameStartAction(handleGameStart);
-    }, []);
-
+        const processCommand = async () => {
+            if (lastJsonMessage !== null) {
+                const command = (lastJsonMessage as Command);
+                if (command.action === "members") {
+                    const room: Room = await api.getRoom(roomId);
+                    setMembers(room.members.sort() || []);
+                }
+                else if (command.action === "start" && command.params.isValid) {
+                    startGame(userId, command);
+                    navigate(`../game/${roomId}`);
+                    // need to find a way to not delete the room when starting
+                }
+            }
+        }
+        processCommand();
+    }, [lastJsonMessage]);
 
     return (
-        <div>
-            {`Room ${params.roomId}`}
-
+        <>
+            <p>
+                {`Room ${roomId}`}
+            </p>
+            <div>
+                Users:
+                {members.map((member: string, index: number) => (
+                    <p key={index}>{member}</p>
+                ))}
+            </div>
             <button onClick={() => setReady(!ready)}>
                 Ready?
             </button>
             <button disabled={!ready} onClick={() => {
-                ws.sendStartGame();
+                const startCommand = { action: "start", roomId: roomId };
+                sendJsonMessage(startCommand);
             }}>
                 Start game
             </button>
             <Link to="/">
-                <button onClick={() => { ws.close(); }}>
+                <button>
                     Leave room
                 </button>
             </Link>
-        </div>
+        </>
     );
 };
 
