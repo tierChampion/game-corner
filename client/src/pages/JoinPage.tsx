@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useGlobalStore from "../stores/GlobalStore";
 import { Room } from "../utils/HTTPManager";
-import useRoomStore from "../stores/RoomStore";
 
 const JoinPage: React.FC = () => {
     const api = useGlobalStore((state) => state.api);
-    const setRoomId = useRoomStore((state) => state.setRoomId);
+    const setRoomId = useGlobalStore((state) => state.setRoomId);
     const navigate = useNavigate();
     const [rooms, setRooms] = useState<Room[]>([]);
 

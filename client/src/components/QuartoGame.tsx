@@ -6,13 +6,16 @@ import QuartoPiece from "./QuartoPiece";
 
 const QuartoGame: React.FC = () => {
     const piece = useQuartoStore((state) => state.piece);
+    const place = useQuartoStore((state) => state.place);
 
     return (
         <div className="game-container">
             <QuartoBoard />
             <QuartoPieceBank />
             <div className={"chosen-piece-square"}>
-                <QuartoPiece {...piece} />
+                {place === -1 &&
+                    <QuartoPiece {...piece} />
+                }
             </div>
         </div>
     );

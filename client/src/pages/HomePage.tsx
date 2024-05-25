@@ -1,12 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import useGlobalStore from "../stores/GlobalStore";
 import { Room } from "../utils/HTTPManager";
-import useRoomStore from "../stores/RoomStore";
 
 const HomePage: React.FC = () => {
     const api = useGlobalStore((state) => state.api);
     const userId = useGlobalStore((state) => state.userId);
-    const setRoomId = useRoomStore((state) => state.setRoomId);
+    const setRoomId = useGlobalStore((state) => state.setRoomId);
     const navigate = useNavigate();
 
     const createRoom = () => {

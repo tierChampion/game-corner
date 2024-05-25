@@ -1,17 +1,16 @@
 import { SERVER_SOCKET_URL } from "../env";
 import useWebSocket from "react-use-websocket";
 import useGlobalStore from "../stores/GlobalStore";
-import useRoomStore from "../stores/RoomStore";
 
 export interface Command {
     action: string;
     params: any;
 }
 
-const useTestWebSocket = () => {
+const useCustomWebSocket = () => {
 
     const userId = useGlobalStore((state) => state.userId);
-    const roomId = useRoomStore((state) => state.roomId);
+    const roomId = useGlobalStore((state) => state.roomId);
 
     const { sendJsonMessage, lastJsonMessage } = useWebSocket(SERVER_SOCKET_URL, {
         onOpen: () => {
@@ -27,4 +26,4 @@ const useTestWebSocket = () => {
     return { sendJsonMessage, lastJsonMessage };
 };
 
-export default useTestWebSocket;
+export default useCustomWebSocket;

@@ -1,9 +1,9 @@
 import "../styles/Quarto.css";
 import QuartoPiece, { QuartoPieceData } from "./QuartoPiece";
-import useQuartoStore from "../stores/QuartoStore";
+import useQuartoStore, {GameStatus} from "../stores/QuartoStore";
 
 const QuartoBoard: React.FC = () => {
-
+    const status = useQuartoStore((state) => state.status);
     const turn = useQuartoStore((state) => state.turn);
     const board = useQuartoStore((state) => state.board);
     const piece = useQuartoStore((state) => state.piece);
@@ -11,7 +11,7 @@ const QuartoBoard: React.FC = () => {
     const setPlace = useQuartoStore((state) => state.setPlace);    
 
     const placePiece = (index: number) => {
-        if (turn && piece.isValid) {
+        if (status === GameStatus.IN_PROGRESS && turn && piece.isValid) {
             setPlace((index === place) ? -1 : index);
         }
     }

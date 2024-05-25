@@ -1,29 +1,26 @@
 import { create } from "zustand";
 import { QuartoPieceData } from "../components/QuartoPiece";
+import { Game } from "../utils/HTTPManager";
 
-// whether the game is done or not
-// myTurn
-// board
-// bank
-// pick
-// place
-// piece
+export enum GameStatus {
+    IN_PROGRESS,
+    WON,
+    LOST,
+    DRAWN
+}
 
 interface QuartoState {
-    gameState: string;
+    status: GameStatus;
     turn: boolean;
     board: QuartoPieceData[];
     bank: QuartoPieceData[];
     piece: QuartoPieceData;
     pick: number;
     place: number;
-    setTurn: (newTurn: boolean) => void;
-    setBoard: (newBoard: QuartoPieceData[]) => void;
-    setBank: (newBank: QuartoPieceData[]) => void;
-    setPiece: (newPiece: QuartoPieceData) => void;
     setPick: (newPick: number) => void;
     setPlace: (newPlace: number) => void;
     startGame: (userId: string, command: any) => void;
+    updateGame: (newGame: Game) => void;
 }
 
 const getInitialBoard = () => {
@@ -74,7 +71,7 @@ const getPiece = (index: number) => {
     }
 }
 
-const analyseBoardState = (board: QuartoPieceData[]) => {
+const analyseBoardState = (turn: boolean, board: QuartoPieceData[]): GameStatus => {
     for (let i = 0; i < 4; i++) {
         const first = board[i * 5];
         if (first.isValid) {
@@ -96,7 +93,9 @@ const analyseBoardState = (board: QuartoPieceData[]) => {
                     matches[2] = matches[2] && (other.isTall === first.isTall);
                     matches[3] = matches[3] && (other.hasHole === first.hasHole);
                 }
-                if (matches[0] || matches[1] || matches[2] || matches[3]) return "win";
+                if (matches[0] || matches[1] || matches[2] || matches[3]) {
+                    return turn ? GameStatus.WON : GameStatus.LOST;
+                }
             }
         }
     }
@@ -120,7 +119,9 @@ const analyseBoardState = (board: QuartoPieceData[]) => {
                 matches[2] = matches[2] && (other.isTall === first.isTall);
                 matches[3] = matches[3] && (other.hasHole === first.hasHole);
             }
-            if (matches[0] || matches[1] || matches[2] || matches[3]) return "win";
+            if (matches[0] || matches[1] || matches[2] || matches[3]) {
+                return turn ? GameStatus.WON : GameStatus.LOST;
+            }
         }
     }
 
@@ -129,29 +130,17 @@ const analyseBoardState = (board: QuartoPieceData[]) => {
         validCount += board[i].isValid === true ? 1 : 0;
     }
 
-    return validCount === 16 ? "draw" : "";
+    return validCount === 16 ? GameStatus.DRAWN : GameStatus.IN_PROGRESS;
 }
 
 const useQuartoStore = create<QuartoState>()((set) => ({
-    gameState: "",
+    status: GameStatus.IN_PROGRESS,
     turn: false,
     board: getInitialBoard(),
     bank: getInitialBank(),
     piece: getPiece(-1),
     pick: -1,
     place: -1,
-    setTurn: (newTurn) => set(() => ({ turn: newTurn })),
-    setBoard: (newBoard: QuartoPieceData[]) => set((state) => {
-        const newValue = state.turn ? newBoard : state.board;
-        return { board: newValue };
-    }),
-    setBank: (newBank: QuartoPieceData[]) => set((state) => {
-        const newValue = state.turn ? newBank : state.bank;
-        return { bank: newValue };
-    }),
-    setPiece: (newPiece: QuartoPieceData) => set(() => {
-        return {piece: newPiece};
-    }),
     setPick: (newPick: number) => set(() => {
         return { pick: newPick };
     }),
@@ -160,11 +149,24 @@ const useQuartoStore = create<QuartoState>()((set) => ({
     }),
     startGame: (userId: string, command: any) => set(() => {
         return {
-            gameState: "",
+            status: GameStatus.IN_PROGRESS,
             board: getInitialBoard(),
             bank: getInitialBank(),
-            selectedPiece: -1,
+            piece: getPiece(-1),
+            pick: -1,
+            place: -1,
             turn: command.params.start === userId,
+        };
+    }),
+    updateGame: (newGame: Game) => set((state) => {
+        // update gamestate todo
+        const pieceBoard = newGame.board.map((piece) => getPiece(piece));
+        const pieceBank = newGame.bank.map((piece) => getPiece(piece));
+        const piece = getPiece(newGame.pick);
+        const status = analyseBoardState(state.turn, pieceBoard);
+        return {
+            status: status, board: pieceBoard, bank: pieceBank, piece: piece,
+            pick: -1, place: -1, turn: !state.turn
         };
     }),
 }));

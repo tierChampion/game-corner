@@ -26,7 +26,7 @@ class GameService {
     }
 
     async getGame(gameId: string) {
-        return (await this.getAllGames()).filter((game: Game) => game.id === gameId);
+        return (await this.getAllGames()).filter((game: Game) => game.id === gameId)[0];
     }
 
     async createNewGame(roomId: string) {

@@ -1,21 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useRoomStore from "../stores/RoomStore";
 import useGlobalStore from "../stores/GlobalStore";
 import useQuartoStore from "../stores/QuartoStore";
-import useTestWebSocket, { Command } from "../components/WebSocket";
+import useCustomWebSocket, { Command } from "../components/CustomWebSocket";
 import { Room } from "../utils/HTTPManager";
 
 const RoomPage: React.FC = () => {
     const api = useGlobalStore((state) => state.api);
     const userId = useGlobalStore((state) => state.userId);
-    const roomId = useRoomStore((state) => state.roomId);
+    const roomId = useGlobalStore((state) => state.roomId);
     const [members, setMembers] = useState<string[]>([]);
     const startGame = useQuartoStore((state) => state.startGame);
     const [ready, setReady] = useState<boolean>(false);
     const navigate = useNavigate();
 
-    const { sendJsonMessage, lastJsonMessage } = useTestWebSocket();
+    const { sendJsonMessage, lastJsonMessage } = useCustomWebSocket();
 
     useEffect(() => {
         const processCommand = async () => {
@@ -28,7 +27,6 @@ const RoomPage: React.FC = () => {
                 else if (command.action === "start" && command.params.isValid) {
                     startGame(userId, command);
                     navigate(`../game/${roomId}`);
-                    // need to find a way to not delete the room when starting
                 }
             }
         }

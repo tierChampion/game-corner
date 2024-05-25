@@ -8,7 +8,6 @@ interface UserInformation {
 }
 
 class ServerWebSocket {
-
     private wss: WebSocket.Server;
     private roomService: RoomService;
     private gameService: GameService;
@@ -40,16 +39,16 @@ class ServerWebSocket {
         console.log("New command: ", command);
         switch (command.action) {
             case "connect":
-                this.connection(ws, command.roomId, command.userId);
+                this.connect(ws, command.roomId, command.userId);
                 break;
             case "start":
-                this.startGame(command.roomId);
+                this.start(command.roomId);
                 break;
             case "end":
-                this.endGame(command.roomId);
+                this.end(command.roomId);
                 break;
             case "move":
-                this.moveGame(command.gameId, command.pick, command.place);
+                this.move(command.gameId, command.pick, command.place);
                 break;
             default:
         }
@@ -66,7 +65,7 @@ class ServerWebSocket {
         return sockets;
     }
 
-    async connection(ws: WebSocket, roomId: string, userId: string) {
+    async connect(ws: WebSocket, roomId: string, userId: string) {
         if (this.userMap.get(userId) === undefined) {
             await this.roomService.addPlayer(roomId, userId);
             const userInformation = { userId: userId, roomId: roomId };
@@ -82,7 +81,7 @@ class ServerWebSocket {
         await this.broadcastToRoom(roomId, "", "members");
     }
 
-    async startGame(roomId: string) {
+    async start(roomId: string) {
         const room = await this.roomService.getRoom(roomId);
         const isValid = room.members?.length === 2;
         if (isValid) { 
@@ -95,12 +94,12 @@ class ServerWebSocket {
             });
     }
 
-    async endGame(roomId: string) {
+    async end(roomId: string) {
         await this.gameService.deleteGame(roomId);
         await this.broadcastToRoom(roomId, "", "end");
     }
 
-    async moveGame(gameId: string, pick: number, place: number) {
+    async move(gameId: string, pick: number, place: number) {
         await this.gameService.placeAndPick(gameId, place, pick);
         await this.broadcastToRoom(gameId, "", "move",
             { pick: pick, place: place });
