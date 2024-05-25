@@ -23,22 +23,4 @@ router.get("/:gameId", async (req: Request, res: Response) => {
     }
 });
 
-router.post("/", async (req: Request, res: Response) => {
-    try {
-        const newGame = await gameService.createNewGame(req.body.roomId);
-        res.status(HTTP_STATUS.CREATED).json(newGame);
-    } catch (err) {
-        res.status(HTTP_STATUS.SERVER_ERROR).json(err);
-    }
-});
-
-router.delete("/:gameId", async (req: Request, res: Response) => {
-    try {
-        await gameService.deleteGame(req.params.gameId);
-        res.status(HTTP_STATUS.NO_CONTENT);
-    } catch (err) {
-        res.status(HTTP_STATUS.SERVER_ERROR).json(err);
-    }
-});
-
 export default router;

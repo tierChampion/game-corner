@@ -3,14 +3,14 @@ import QuartoPiece, { QuartoPieceData } from "./QuartoPiece";
 import useQuartoStore from "../stores/QuartoStore";
 
 const QuartoPieceBank: React.FC = () => {
-
+    const turn = useQuartoStore((state) => state.turn);
     const bank = useQuartoStore((state) => state.bank);
-    const selectedPiece = useQuartoStore((state) => state.selectedPiece);
-    const setSelectedPiece = useQuartoStore((state) => state.setSelectedPiece);
+    const pick = useQuartoStore((state) => state.pick);
+    const setPick = useQuartoStore((state) => state.setPick);
 
     const selectPiece = (index: number) => {
-        if (bank[index].isValid) {
-            setSelectedPiece((selectedPiece !== index) ? index : -1)
+        if (turn && bank[index].isValid) {
+            setPick((pick !== index) ? index : -1)
         }
     }
 
@@ -19,7 +19,7 @@ const QuartoPieceBank: React.FC = () => {
             {bank.map((piece: QuartoPieceData, index: number) => {
                 return (
                     <div key={`bank-square-${index}`}
-                        className={"bank-square" + (selectedPiece === index ? " selected" : "")}
+                        className={"bank-square" + (pick === index ? " selected" : "")}
                         onClick={() => selectPiece(index)}>
                         <QuartoPiece key={`bank-piece-${index}`} {...piece} />
                     </div>

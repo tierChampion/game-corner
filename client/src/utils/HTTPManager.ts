@@ -51,11 +51,20 @@ export interface Room {
   members: string[]
 }
 
+export interface Game {
+  id: string,
+  board: number[],
+  bank: number[],
+  pick: number
+}
+
 export default class HTTPManager {
   private roomEndpoint: string;
+  private gameEndpoint: string;
 
   constructor() {
       this.roomEndpoint = "rooms";
+      this.gameEndpoint = "games";
    }
 
   async getAllRooms(): Promise<Room[]> {
@@ -68,5 +77,9 @@ export default class HTTPManager {
 
   async createRoom(): Promise<Room> {
     return await HTTPInterface.POST(this.roomEndpoint, {});
+  }
+
+  async getGame(gameId: string): Promise<Game> {
+    return await HTTPInterface.GET(`${this.gameEndpoint}/${gameId}`);
   }
 }

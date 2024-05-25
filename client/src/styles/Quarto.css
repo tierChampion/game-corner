@@ -3,7 +3,7 @@
 }
 
 .game-container {
-    display:flex;
+    display: flex;
     align-items: center;
 }
 
@@ -79,6 +79,15 @@
     border-radius: 100%;
     /* border: 1px solid var(--wood-color); */
     background-color: var(--wood-color);
+}
+
+.chosen-piece-square {
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--wood-color);
+    background-color: black;
+    align-items: center;
+    justify-content: center;
 }
 
 .piece {

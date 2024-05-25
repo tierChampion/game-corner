@@ -1,18 +1,29 @@
 import { create } from "zustand";
 import { QuartoPieceData } from "../components/QuartoPiece";
 
+// whether the game is done or not
+// myTurn
+// board
+// bank
+// pick
+// place
+// piece
+
 interface QuartoState {
     gameState: string;
     turn: boolean;
-    selectedPiece: number;
     board: QuartoPieceData[];
     bank: QuartoPieceData[];
-    setSelectedPiece: (newSelectedPiece: number) => void;
+    piece: QuartoPieceData;
+    pick: number;
+    place: number;
+    setTurn: (newTurn: boolean) => void;
     setBoard: (newBoard: QuartoPieceData[]) => void;
     setBank: (newBank: QuartoPieceData[]) => void;
-    setTurn: (newTurn: boolean) => void;
+    setPiece: (newPiece: QuartoPieceData) => void;
+    setPick: (newPick: number) => void;
+    setPlace: (newPlace: number) => void;
     startGame: (userId: string, command: any) => void;
-    executeMove: (command: any) => void;
 }
 
 const getInitialBoard = () => {
@@ -43,9 +54,27 @@ const getInitialBank = () => {
     return bank;
 };
 
-// this doesnt work
+const getPiece = (index: number) => {
+    if (index === -1) {
+        return {
+            isValid: false,
+            isBlack: false,
+            isTall: false,
+            isSquare: false,
+            hasHole: false,
+        }
+    } else {
+        return {
+            isValid: true,
+            isBlack: (index & 8) === 0,
+            isTall: (index & 4) !== 0,
+            isSquare: (index & 2) === 0,
+            hasHole: (index & 1) !== 0,
+        }
+    }
+}
+
 const analyseBoardState = (board: QuartoPieceData[]) => {
-    console.log(board);
     for (let i = 0; i < 4; i++) {
         const first = board[i * 5];
         if (first.isValid) {
@@ -75,7 +104,6 @@ const analyseBoardState = (board: QuartoPieceData[]) => {
     for (let d = 0; d < 2; d++) {
         const first = board[d * 3];
         if (first.isValid) {
-            let winning = true;
             let matches = [true, true, true, true];
             for (let i = 1; i < 4; i++) {
                 const index = (d === 0) ? 5 * i : 3 * (i + 1);
@@ -107,13 +135,12 @@ const analyseBoardState = (board: QuartoPieceData[]) => {
 const useQuartoStore = create<QuartoState>()((set) => ({
     gameState: "",
     turn: false,
-    selectedPiece: -1,
     board: getInitialBoard(),
     bank: getInitialBank(),
-    setSelectedPiece: (newSelectedPiece: number) => set((state) => {
-        const newValue = state.turn ? newSelectedPiece : state.selectedPiece;
-        return { selectedPiece: newValue };
-    }),
+    piece: getPiece(-1),
+    pick: -1,
+    place: -1,
+    setTurn: (newTurn) => set(() => ({ turn: newTurn })),
     setBoard: (newBoard: QuartoPieceData[]) => set((state) => {
         const newValue = state.turn ? newBoard : state.board;
         return { board: newValue };
@@ -122,7 +149,15 @@ const useQuartoStore = create<QuartoState>()((set) => ({
         const newValue = state.turn ? newBank : state.bank;
         return { bank: newValue };
     }),
-    setTurn: (newTurn) => set(() => ({ turn: newTurn })),
+    setPiece: (newPiece: QuartoPieceData) => set(() => {
+        return {piece: newPiece};
+    }),
+    setPick: (newPick: number) => set(() => {
+        return { pick: newPick };
+    }),
+    setPlace: (newPlace: number) => set(() => {
+        return { place: newPlace };
+    }),
     startGame: (userId: string, command: any) => set(() => {
         return {
             gameState: "",
@@ -130,30 +165,6 @@ const useQuartoStore = create<QuartoState>()((set) => ({
             bank: getInitialBank(),
             selectedPiece: -1,
             turn: command.params.start === userId,
-        };
-    }),
-    executeMove: (command: any) => set((state) => {
-        const newBoard = [...state.board];
-        const newBank = [...state.bank];
-        newBoard[command.params.boardSquare] = { ...newBank[command.params.selectedPiece] };
-        console.log(command);
-        newBank[command.params.selectedPiece].isValid = false;
-        let newTurn = !state.turn;
-
-        const boardState = analyseBoardState(state.turn ? state.board : newBoard);
-        let newGameState = "";
-        if (boardState === "win") {
-            newGameState = state.turn ? "winner" : "loser";
-            newTurn = false;
-        } else if (boardState === "draw") {
-            newGameState = "draw";
-            newTurn = false;
-        }
-
-        if (state.turn) return { gameState: newGameState, turn: newTurn };
-        return {
-            gameState: newGameState, board: newBoard, bank: newBank,
-            selectedPiece: -1, turn: newTurn
         };
     }),
 }));

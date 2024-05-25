@@ -9,7 +9,6 @@ export interface QuartoPieceData {
 }
 
 const QuartoPiece: React.FC<QuartoPieceData> = (pieceData) => {
-
     const getStyle = (piece: QuartoPieceData) => {
         let style = "piece";
         if (piece.isValid) {
@@ -24,14 +23,12 @@ const QuartoPiece: React.FC<QuartoPieceData> = (pieceData) => {
     }
 
     return (
-        <>
-            <div className={getStyle(pieceData)}>
-                {pieceData.hasHole &&
-                    <div className={getStyle(pieceData) + " hole"}>
-                    </div>
-                }
-            </div>
-        </>
+        <div className={getStyle(pieceData)}>
+            {pieceData.hasHole &&
+                <div className={getStyle(pieceData) + " hole"}>
+                </div>
+            }
+        </div>
     );
 };
 
