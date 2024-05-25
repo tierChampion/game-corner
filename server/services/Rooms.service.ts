@@ -52,25 +52,28 @@ class RoomService {
     async removePlayer(roomId: string, playerId: string) {
         let wasModified = false;
         let rooms = await this.getAllRooms();
+        let hasEmptyRoom = false;
         rooms = rooms.filter((room: Room) => {
             if (room.id === roomId) {
                 let length = room.members.length;
                 room.members = room.members.filter((id: string) => id !== playerId);
                 wasModified = room.members.length !== length;
             }
-            // todo add a set timeout when the room is empty. 
-            // if in 10 seconds, it is still empty, destroy the room
-            // if (room.members.length !== 0) {
+            if (room.members.length === 0) {
+                hasEmptyRoom = true;
+            }
             return room;
-            // }
         });
         await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
+        if (hasEmptyRoom) {
+            setTimeout(() => this.cleanRooms(), 3000);
+        }
         return wasModified;
     }
 
-    async deleteRoom(id: string) {
+    async cleanRooms() {
         let rooms = await this.getAllRooms();
-        rooms = rooms.filter((roomId: string) => roomId !== id);
+        rooms = rooms.filter((room: Room) => room.members.length !== 0);
         await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
     }
 }

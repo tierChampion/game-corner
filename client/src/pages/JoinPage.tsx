@@ -10,22 +10,32 @@ const JoinPage: React.FC = () => {
     const navigate = useNavigate();
     const [rooms, setRooms] = useState<Room[]>([]);
 
-    useEffect(() => {
-        const roomsFetch = async () => {
-            try {
-                setRooms(await api.getAllRooms());
-            } catch (err) {
-                setRooms([]);
-                console.error("Error when connecting to server, could not get rooms.");
-            }
+    const roomsFetch = async () => {
+        try {
+            return await api.getAllRooms();
+        } catch (err) {
+            console.error("Error when connecting to server, could not get rooms.");
+            return [];
         }
-        roomsFetch();
+    }
+
+    useEffect(() => {
+        const initialFetch = async () => {
+            setRooms(await roomsFetch());
+        }
+        initialFetch();
     }, []);
 
     const joinRoom = (roomId: string) => {
         const roomJoining = async (roomId: string) => {
-            setRoomId(roomId);
-            // navigate(`/room/${roomId}`);
+            const newRooms = await roomsFetch();
+            if (newRooms.find((room: Room) => room.id === roomId) !== undefined) {
+                setRoomId(roomId);
+                navigate(`/room/${roomId}`);
+            } else {
+                console.error("Error, the room was inactive for too long.");
+                setRooms(newRooms);
+            }
         }
         roomJoining(roomId);
     }
@@ -34,11 +44,9 @@ const JoinPage: React.FC = () => {
         return (
             <>
                 {rooms.map((room: Room, index) => (
-                    <Link key={index} to={`/room/${room.id}`}>
-                        <p onClick={() => joinRoom(room.id)}>
-                            {room.id}
-                        </p>
-                    </Link>
+                    <button key={index} onClick={() => joinRoom(room.id)}>
+                        {room.id + " (" + room.members.length + ")"}
+                    </button>
                 ))
                 }
                 <Link to="/">
