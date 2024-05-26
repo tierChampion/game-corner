@@ -3,12 +3,7 @@ import QuartoPiece, { QuartoPieceData } from "./QuartoPiece";
 import useQuartoStore, {GameStatus} from "../stores/QuartoStore";
 
 const QuartoBoard: React.FC = () => {
-    const status = useQuartoStore((state) => state.status);
-    const turn = useQuartoStore((state) => state.turn);
-    const board = useQuartoStore((state) => state.board);
-    const piece = useQuartoStore((state) => state.piece);
-    const place = useQuartoStore((state) => state.place);
-    const setPlace = useQuartoStore((state) => state.setPlace);    
+    const {status, turn, board, piece, place, setPlace} = useQuartoStore();
 
     const placePiece = (index: number) => {
         if (status === GameStatus.IN_PROGRESS && turn && piece.isValid) {

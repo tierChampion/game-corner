@@ -5,8 +5,7 @@ import QuartoPieceBank from "./QuartoPieceBank";
 import QuartoPiece from "./QuartoPiece";
 
 const QuartoGame: React.FC = () => {
-    const piece = useQuartoStore((state) => state.piece);
-    const place = useQuartoStore((state) => state.place);
+    const {piece, place} = useQuartoStore();
 
     return (
         <div className="game-container">

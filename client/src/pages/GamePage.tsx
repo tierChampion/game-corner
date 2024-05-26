@@ -1,20 +1,15 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useGlobalStore from "../stores/GlobalStore";
 import QuartoGame from "../components/QuartoGame";
 import useQuartoStore, { GameStatus } from "../stores/QuartoStore";
 import useCustomWebSocket from "../components/CustomWebSocket";
 import { Command } from "../components/CustomWebSocket";
+import { Button } from "@/components/ui/button";
 
 const GamePage: React.FC = () => {
-    const api = useGlobalStore((state) => state.api);
-    const roomId = useGlobalStore((state) => state.roomId);
-    const status = useQuartoStore((state) => state.status);
-    const turn = useQuartoStore((state) => state.turn);
-    const pick = useQuartoStore((state) => state.pick);
-    const place = useQuartoStore((state) => state.place);
-    const piece = useQuartoStore((state) => state.piece);
-    const updateGame = useQuartoStore((state) => state.updateGame);
+    const {api, roomId} = useGlobalStore();
+    const {status, turn, pick, place, piece, updateGame} = useQuartoStore();
     const navigate = useNavigate();
 
     const { sendJsonMessage, lastJsonMessage } = useCustomWebSocket();
@@ -61,15 +56,15 @@ const GamePage: React.FC = () => {
             <QuartoGame />
             <div>{statusMessage()}</div>
             <Link to={`/room/${roomId}`}>
-                <button onClick={() => {
+                <Button onClick={() => {
                     const endCommand = { action: "end", roomId: roomId };
                     sendJsonMessage(endCommand);
                 }}>
                     Leave game
-                </button>
+                </Button>
             </Link>
-            <button disabled={!isMoveValid()}
-                onClick={sendMove}>Confirm move</button>
+            <Button disabled={!isMoveValid()}
+                onClick={sendMove}>Confirm move</Button>
         </>
     );
 };

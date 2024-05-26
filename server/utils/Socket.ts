@@ -22,7 +22,6 @@ class ServerWebSocket {
         this.userMap = new Map();
 
         this.wss.on("connection", (ws, req) => {
-
             ws.on("message", (message) => {
                 this.handleCommand(ws, message);
             });

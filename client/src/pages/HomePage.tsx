@@ -1,11 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import useGlobalStore from "../stores/GlobalStore";
 import { Room } from "../utils/HTTPManager";
+import { Button } from "@/components/ui/button";
 
 const HomePage: React.FC = () => {
-    const api = useGlobalStore((state) => state.api);
-    const userId = useGlobalStore((state) => state.userId);
-    const setRoomId = useGlobalStore((state) => state.setRoomId);
+    const {api, userId, setRoomId} = useGlobalStore();
     const navigate = useNavigate();
 
     const createRoom = () => {
@@ -23,14 +22,13 @@ const HomePage: React.FC = () => {
 
     return (
         <>
-            Home page
-            <button onClick={createRoom}>
+            <Button onClick={createRoom}>
                 Create room
-            </button>
+            </Button>
             <Link to="/join">
-                <button>
+                <Button>
                     Join room
-                </button>
+                </Button>
             </Link>
             <p>
                 id: {userId}

@@ -159,7 +159,6 @@ const useQuartoStore = create<QuartoState>()((set) => ({
         };
     }),
     updateGame: (newGame: Game) => set((state) => {
-        // update gamestate todo
         const pieceBoard = newGame.board.map((piece) => getPiece(piece));
         const pieceBank = newGame.bank.map((piece) => getPiece(piece));
         const piece = getPiece(newGame.pick);

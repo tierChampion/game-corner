@@ -4,15 +4,16 @@ import useGlobalStore from "../stores/GlobalStore";
 import useQuartoStore from "../stores/QuartoStore";
 import useCustomWebSocket, { Command } from "../components/CustomWebSocket";
 import { Room } from "../utils/HTTPManager";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 
 const RoomPage: React.FC = () => {
-    const api = useGlobalStore((state) => state.api);
-    const userId = useGlobalStore((state) => state.userId);
-    const roomId = useGlobalStore((state) => state.roomId);
-    const [members, setMembers] = useState<string[]>([]);
+    const {api, userId, roomId} = useGlobalStore();
     const startGame = useQuartoStore((state) => state.startGame);
-    const [ready, setReady] = useState<boolean>(false);
     const navigate = useNavigate();
+
+    const [ready, setReady] = useState<boolean>(false);
+    const [members, setMembers] = useState<string[]>([]);
 
     const { sendJsonMessage, lastJsonMessage } = useCustomWebSocket();
 
@@ -44,19 +45,17 @@ const RoomPage: React.FC = () => {
                     <p key={index}>{member}</p>
                 ))}
             </div>
-            <button onClick={() => setReady(!ready)}>
-                Ready?
-            </button>
-            <button disabled={!ready} onClick={() => {
+            <Switch checked={ready} onCheckedChange={() => setReady(!ready)}/>
+            <Button disabled={!ready} onClick={() => {
                 const startCommand = { action: "start", roomId: roomId };
                 sendJsonMessage(startCommand);
             }}>
                 Start game
-            </button>
+            </Button>
             <Link to="/">
-                <button>
+                <Button>
                     Leave room
-                </button>
+                </Button>
             </Link>
         </>
     );
