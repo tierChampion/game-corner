@@ -6,9 +6,12 @@ import useCustomWebSocket, { Command } from "../components/CustomWebSocket";
 import { Room } from "../utils/HTTPManager";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Label } from "@radix-ui/react-label";
+import InfoHeader from "@/components/InfoHeader";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
 
 const RoomPage: React.FC = () => {
-    const {api, userId, roomId} = useGlobalStore();
+    const { api, userId, roomId, setRoomId } = useGlobalStore();
     const startGame = useQuartoStore((state) => state.startGame);
     const navigate = useNavigate();
 
@@ -36,16 +39,15 @@ const RoomPage: React.FC = () => {
 
     return (
         <>
-            <p>
-                {`Room ${roomId}`}
-            </p>
+            <InfoHeader />
+            <Label>Users:</Label>
             <div>
-                Users:
                 {members.map((member: string, index: number) => (
                     <p key={index}>{member}</p>
                 ))}
             </div>
-            <Switch checked={ready} onCheckedChange={() => setReady(!ready)}/>
+            <Label>Ready</Label>
+            <Switch checked={ready} onCheckedChange={() => setReady(!ready)} />
             <Button disabled={!ready} onClick={() => {
                 const startCommand = { action: "start", roomId: roomId };
                 sendJsonMessage(startCommand);
@@ -53,7 +55,7 @@ const RoomPage: React.FC = () => {
                 Start game
             </Button>
             <Link to="/">
-                <Button>
+                <Button onClick={() => setRoomId("")}>
                     Leave room
                 </Button>
             </Link>

@@ -2,10 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useGlobalStore from "../stores/GlobalStore";
 import { Room } from "../utils/HTTPManager";
+import InfoHeader from "@/components/InfoHeader";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { CubeIcon } from "@radix-ui/react-icons";
+import RoomCreationButton from "@/components/RoomCreationButton";
 
 const JoinPage: React.FC = () => {
-    const {api, setRoomId} = useGlobalStore();
+    const { api, setRoomId } = useGlobalStore();
     const navigate = useNavigate();
     const [rooms, setRooms] = useState<Room[]>([]);
 
@@ -58,14 +62,20 @@ const JoinPage: React.FC = () => {
     }
     else {
         return (
-            <>
-                <div>There are no rooms for now!</div>
+            <div className="h-screen w-screen flex flex-col bg-slate-400">
+                <InfoHeader />
+                <Alert>
+                    <CubeIcon></CubeIcon>
+                    <AlertTitle>There are no rooms for now.</AlertTitle>
+                    <AlertDescription>Come back later or create your own!</AlertDescription>
+                </Alert>
+                <RoomCreationButton />
                 <Link to="/">
-                    <Button>
+                    <Button className="w-full">
                         Go back to Home page
                     </Button>
                 </Link>
-            </>
+            </div>
         );
     }
 };
