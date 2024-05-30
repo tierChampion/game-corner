@@ -5,12 +5,16 @@ import { Room } from "../utils/HTTPManager";
 import InfoHeader from "@/components/InfoHeader";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { CubeIcon } from "@radix-ui/react-icons";
+import { CubeIcon, ReloadIcon } from "@radix-ui/react-icons";
 import RoomCreationButton from "@/components/RoomCreationButton";
+import { Separator } from "@radix-ui/react-separator";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { ScrollBar } from "@/components/ui/scroll-area";
 
 const JoinPage: React.FC = () => {
     const { api, setRoomId } = useGlobalStore();
     const navigate = useNavigate();
+    const [loaded, setLoaded] = useState<boolean>(false);
     const [rooms, setRooms] = useState<Room[]>([]);
 
     const roomsFetch = async () => {
@@ -25,6 +29,7 @@ const JoinPage: React.FC = () => {
     useEffect(() => {
         const initialFetch = async () => {
             setRooms(await roomsFetch());
+            setLoaded(true);
         }
         initialFetch();
     }, []);
@@ -43,35 +48,49 @@ const JoinPage: React.FC = () => {
         roomJoining(roomId);
     }
 
-    if (rooms.length > 0) {
+    if (rooms.length > 0 || !loaded) {
         return (
-            <>
-                {rooms.map((room: Room, index) => (
-                    <Button key={index} onClick={() => joinRoom(room.id)}>
-                        {room.id + " (" + room.members.length + ")"}
-                    </Button>
-                ))
-                }
-                <Link to="/">
+            <div className="h-screen w-screen flex flex-col items-center bg-slate-400">
+                <InfoHeader />
+                <div className="p-4">
+                    <h4 className="mb-4 text-sm font-medium leading-none">Rooms</h4>
+                    {!loaded &&
+                            <ReloadIcon className="animate-spin"/>
+                    }
+                    {loaded &&
+                        <ScrollArea className="w-full h-2/3 rounded-md border overflow-x-auto">
+                            {rooms.map((room: Room, index) => (
+                                <div key={index}>
+                                    <Button variant="ghost" onClick={() => joinRoom(room.id)}>
+                                        {room.id + " (" + room.members.length + ")"}
+                                    </Button>
+                                    <Separator className="my-2" />
+                                </div>
+                            ))}
+                            <ScrollBar orientation="vertical" />
+                        </ScrollArea>
+                    }
+                </div>
+                <Link to="/" className="w-1/4 flex justify-center">
                     <Button>
                         Go back to Home page
                     </Button>
                 </Link>
-            </>
+            </div>
         );
     }
     else {
         return (
-            <div className="h-screen w-screen flex flex-col bg-slate-400">
+            <div className="h-screen w-screen flex flex-col items-center bg-slate-400">
                 <InfoHeader />
-                <Alert>
+                <Alert className="w-3/4">
                     <CubeIcon></CubeIcon>
                     <AlertTitle>There are no rooms for now.</AlertTitle>
                     <AlertDescription>Come back later or create your own!</AlertDescription>
                 </Alert>
                 <RoomCreationButton />
-                <Link to="/">
-                    <Button className="w-full">
+                <Link to="/" className="w-1/4 flex justify-center">
+                    <Button>
                         Go back to Home page
                     </Button>
                 </Link>

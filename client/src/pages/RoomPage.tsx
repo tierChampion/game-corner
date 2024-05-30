@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@radix-ui/react-label";
 import InfoHeader from "@/components/InfoHeader";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
 
 const RoomPage: React.FC = () => {
     const { api, userId, roomId, setRoomId } = useGlobalStore();
@@ -38,7 +37,7 @@ const RoomPage: React.FC = () => {
     }, [lastJsonMessage]);
 
     return (
-        <>
+        <div className="w-screen h-screen flex flex-col items-center bg-slate-400">
             <InfoHeader />
             <Label>Users:</Label>
             <div>
@@ -46,20 +45,24 @@ const RoomPage: React.FC = () => {
                     <p key={index}>{member}</p>
                 ))}
             </div>
-            <Label>Ready</Label>
-            <Switch checked={ready} onCheckedChange={() => setReady(!ready)} />
-            <Button disabled={!ready} onClick={() => {
-                const startCommand = { action: "start", roomId: roomId };
-                sendJsonMessage(startCommand);
-            }}>
-                Start game
-            </Button>
-            <Link to="/">
-                <Button onClick={() => setRoomId("")}>
-                    Leave room
+            <div className="w-full flex flex-row justify-center gap-4">
+                <Label>Ready</Label>
+                <Switch checked={ready} onCheckedChange={() => setReady(!ready)} />
+            </div>
+            <div className="w-full flex flex-row justify-center gap-4">
+                <Button disabled={!ready || members.length !== 2} onClick={() => {
+                    const startCommand = { action: "start", roomId: roomId };
+                    sendJsonMessage(startCommand);
+                }}>
+                    Start game
                 </Button>
-            </Link>
-        </>
+                <Link to="/">
+                    <Button variant="destructive" onClick={() => setRoomId("")}>
+                        Leave room
+                    </Button>
+                </Link>
+            </div>
+        </div>
     );
 };
 

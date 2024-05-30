@@ -2,7 +2,7 @@ import "../styles/Quarto.css"
 import QuartoPiece, { QuartoPieceData } from "./QuartoPiece";
 import useQuartoStore, {GameStatus} from "../stores/QuartoStore";
 
-const QuartoPieceBank: React.FC = () => {
+const QuartoBank: React.FC = () => {
     const {status, turn, bank, pick, setPick} = useQuartoStore();
 
     const selectPiece = (index: number) => {
@@ -26,4 +26,4 @@ const QuartoPieceBank: React.FC = () => {
     );
 }
 
-export default QuartoPieceBank;
+export default QuartoBank;

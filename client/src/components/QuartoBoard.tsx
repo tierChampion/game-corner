@@ -13,7 +13,7 @@ const QuartoBoard: React.FC = () => {
 
     return (
         <div className="board">
-            <div className="ring">
+            <div className="quarto-ring">
                 <div className="play-board">
                     {board.map((boardPiece: QuartoPieceData, index: number) => {
                         const usedPiece = (index === place) ? piece : boardPiece;

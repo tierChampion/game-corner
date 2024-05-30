@@ -1,7 +1,5 @@
 import "@/styles/index.css"
-import { Link, useNavigate } from "react-router-dom";
-import useGlobalStore from "../stores/GlobalStore";
-import { Room } from "../utils/HTTPManager";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Label } from "@radix-ui/react-label";
 import InfoHeader from "@/components/InfoHeader";

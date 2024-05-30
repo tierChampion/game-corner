@@ -1,15 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useGlobalStore from "../stores/GlobalStore";
-import QuartoGame from "../components/QuartoGame";
+import QuartoBoard from "@/components/QuartoBoard";
+import QuartoBank from "@/components/QuartoBank";
+import QuartoPiece from "@/components/QuartoPiece";
 import useQuartoStore, { GameStatus } from "../stores/QuartoStore";
 import useCustomWebSocket from "../components/CustomWebSocket";
 import { Command } from "../components/CustomWebSocket";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 const GamePage: React.FC = () => {
-    const {api, roomId} = useGlobalStore();
-    const {status, turn, pick, place, piece, updateGame} = useQuartoStore();
+    const { api, roomId } = useGlobalStore();
+    const { status, turn, pick, place, piece, updateGame } = useQuartoStore();
     const navigate = useNavigate();
 
     const { sendJsonMessage, lastJsonMessage } = useCustomWebSocket();
@@ -47,25 +50,43 @@ const GamePage: React.FC = () => {
             case GameStatus.WON: return "You won!";
             case GameStatus.LOST: return "You lost!";
             case GameStatus.DRAWN: return "draw!";
-            default: return turn ? "Your turn" : "";
+            default: return turn ? "Your turn" : "Waiting for the opponent...";
         }
     }
 
     return (
-        <>
-            <QuartoGame />
-            <div>{statusMessage()}</div>
-            <Link to={`/room/${roomId}`}>
-                <Button onClick={() => {
-                    const endCommand = { action: "end", roomId: roomId };
-                    sendJsonMessage(endCommand);
-                }}>
-                    Leave game
-                </Button>
-            </Link>
-            <Button disabled={!isMoveValid()}
-                onClick={sendMove}>Confirm move</Button>
-        </>
+        <div className="w-screen h-screen flex flex-row items-center justify-around bg-slate-400">
+            <div className="flex items-center">
+                <QuartoBoard />
+                <QuartoBank />
+            </div>
+            <div className="h-full flex flex-col justify-around">
+                <div className="flex flex-col items-center gap-5">
+                    <div className="flex flex-col items-center gap-8">
+                        <Label>{statusMessage()}</Label>
+                        <Label>Piece to play</Label>
+                    </div>
+                    <div className="scale-125 chosen-piece-square">
+                        {place === -1 &&
+                            <QuartoPiece {...piece} />
+                        }
+                    </div>
+                </div>
+                <div className="w-1/2 flex items-center justify-around">
+                    <Link to={`/room/${roomId}`}>
+                        <Button variant="destructive" onClick={() => {
+                            const endCommand = { action: "end", roomId: roomId };
+                            sendJsonMessage(endCommand);
+                        }}>
+                            Leave game
+                        </Button>
+                    </Link>
+                    <Button disabled={!isMoveValid()}
+                        onClick={sendMove}>Confirm move</Button>
+
+                </div>
+            </div>
+        </div>
     );
 };
 
