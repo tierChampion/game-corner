@@ -7,10 +7,10 @@ import RoomCreationButton from "@/components/RoomCreationButton";
 
 const HomePage: React.FC = () => {
     return (
-        <div className="h-screen w-screen flex flex-col bg-slate-400">
+        <div className="h-screen w-screen flex flex-col bg-background">
             <InfoHeader />
             <div className="w-full flex flex-col items-center justify-around grow">
-                <Label className="text-8xl">Game Corner</Label>
+                <Label className="text-8xl text-foreground">Game Corner</Label>
                 <div className="w-full flex flex-row justify-center items-center gap-4">
                     <RoomCreationButton/>
                     <Link to="/join">

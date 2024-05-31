@@ -37,20 +37,22 @@ const RoomPage: React.FC = () => {
     }, [lastJsonMessage]);
 
     return (
-        <div className="w-screen h-screen flex flex-col items-center bg-slate-400">
+        <div className="w-screen h-screen flex flex-col items-center bg-background">
             <InfoHeader />
             <div className="w-full flex-grow flex items-center justify-around">
                 <div className="">
-                    <Label>Users:</Label>
-                    <div>
+                    <Label className="text-foreground">Users:</Label>
+                    <div className="flex flex-col border rounded">
                         {members.map((member: string, index: number) => (
-                            <p key={index}>{member}</p>
+                            <Label className="text-foreground" key={index}>
+                                {`${index + 1}. ${member}`}
+                            </Label>
                         ))}
                     </div>
                 </div>
                 <div>
                     <div className="w-full flex flex-row justify-center gap-4">
-                        <Label>Ready</Label>
+                        <Label className="text-foreground">Ready</Label>
                         <Switch checked={ready} onCheckedChange={() => setReady(!ready)} />
                     </div>
                     <div className="w-full flex flex-row justify-center">

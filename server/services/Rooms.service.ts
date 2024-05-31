@@ -67,7 +67,7 @@ class RoomService {
         });
         await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
         if (hasEmptyRoom) {
-            this.cleanRooms();
+            setTimeout(() => this.cleanRooms(), 2000);
         }
         return wasModified;
     }

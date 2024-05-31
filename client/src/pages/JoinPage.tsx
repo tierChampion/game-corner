@@ -50,18 +50,15 @@ const JoinPage: React.FC = () => {
 
     if (rooms.length > 0 || !loaded) {
         return (
-            <div className="h-screen w-screen flex flex-col items-center bg-slate-400">
+            <div className="h-screen w-screen flex flex-col items-center bg-background">
                 <InfoHeader />
                 <div className="p-4">
-                    <h4 className="mb-4 text-sm font-medium leading-none">Rooms</h4>
-                    {!loaded &&
-                            <ReloadIcon className="animate-spin"/>
-                    }
+                    <h4 className="mb-4 text-sm font-medium leading-none text-foreground">Rooms</h4>
                     {loaded &&
                         <ScrollArea className="w-full h-2/3 rounded-md border overflow-x-auto">
                             {rooms.map((room: Room, index) => (
                                 <div key={index}>
-                                    <Button variant="ghost" onClick={() => joinRoom(room.id)}>
+                                    <Button variant="ghost" className="text-foreground" onClick={() => joinRoom(room.id)}>
                                         {room.id + " (" + room.members.length + ")"}
                                     </Button>
                                     <Separator className="my-2" />
@@ -81,7 +78,7 @@ const JoinPage: React.FC = () => {
     }
     else {
         return (
-            <div className="h-screen w-screen flex flex-col items-center bg-slate-400">
+            <div className="h-screen w-screen flex flex-col items-center bg-background">
                 <InfoHeader />
                 <Alert className="w-3/4">
                     <CubeIcon></CubeIcon>
