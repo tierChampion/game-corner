@@ -5,6 +5,7 @@ const ROOMS_FILE = "data/rooms.json";
 export interface Room {
     id: string;
     members: string[];
+    playing: boolean;
 }
 
 class RoomService {
@@ -29,7 +30,7 @@ class RoomService {
 
     async createNewRoom() {
         const rooms = await this.getAllRooms();
-        const newRoom = { id: crypto.randomUUID(), members: [] };
+        const newRoom: Room = { id: crypto.randomUUID(), members: [], playing: false };
         rooms.push(newRoom);
         await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
         return newRoom;
@@ -59,21 +60,45 @@ class RoomService {
                 room.members = room.members.filter((id: string) => id !== playerId);
                 wasModified = room.members.length !== length;
             }
-            if (room.members.length === 0) {
+            if (room.members.length === 0 && !room.playing) {
                 hasEmptyRoom = true;
             }
             return room;
         });
         await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
         if (hasEmptyRoom) {
-            setTimeout(() => this.cleanRooms(), 3000);
+            this.cleanRooms();
         }
         return wasModified;
     }
 
     async cleanRooms() {
         let rooms = await this.getAllRooms();
-        rooms = rooms.filter((room: Room) => room.members.length !== 0);
+        rooms = rooms.filter((room: Room) => room.members.length !== 0 || room.playing);
+        await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
+    }
+
+    async startGame(roomId: string) {
+        let rooms = await this.getAllRooms();
+        rooms = rooms.map((room: Room) => {
+            if (room.id === roomId) {
+                room.playing = true;
+            }
+            return room;
+        });
+
+        await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
+    }
+
+    async endGame(roomId: string) {
+        let rooms = await this.getAllRooms();
+        rooms = rooms.map((room: Room) => {
+            if (room.id === roomId) {
+                room.playing = false;
+            }
+            return room;
+        });
+
         await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
     }
 }

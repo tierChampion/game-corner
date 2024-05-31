@@ -39,28 +39,34 @@ const RoomPage: React.FC = () => {
     return (
         <div className="w-screen h-screen flex flex-col items-center bg-slate-400">
             <InfoHeader />
-            <Label>Users:</Label>
-            <div>
-                {members.map((member: string, index: number) => (
-                    <p key={index}>{member}</p>
-                ))}
-            </div>
-            <div className="w-full flex flex-row justify-center gap-4">
-                <Label>Ready</Label>
-                <Switch checked={ready} onCheckedChange={() => setReady(!ready)} />
-            </div>
-            <div className="w-full flex flex-row justify-center gap-4">
-                <Button disabled={!ready || members.length !== 2} onClick={() => {
-                    const startCommand = { action: "start", roomId: roomId };
-                    sendJsonMessage(startCommand);
-                }}>
-                    Start game
-                </Button>
-                <Link to="/">
-                    <Button variant="destructive" onClick={() => setRoomId("")}>
-                        Leave room
-                    </Button>
-                </Link>
+            <div className="w-full flex-grow flex items-center justify-around">
+                <div className="">
+                    <Label>Users:</Label>
+                    <div>
+                        {members.map((member: string, index: number) => (
+                            <p key={index}>{member}</p>
+                        ))}
+                    </div>
+                </div>
+                <div>
+                    <div className="w-full flex flex-row justify-center gap-4">
+                        <Label>Ready</Label>
+                        <Switch checked={ready} onCheckedChange={() => setReady(!ready)} />
+                    </div>
+                    <div className="w-full flex flex-row justify-center">
+                        <Button disabled={!ready || members.length !== 2} onClick={() => {
+                            const startCommand = { action: "start", roomId: roomId };
+                            sendJsonMessage(startCommand);
+                        }}>
+                            Start game
+                        </Button>
+                        <Link to="/">
+                            <Button variant="destructive" onClick={() => setRoomId("")}>
+                                Leave room
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
             </div>
         </div>
     );

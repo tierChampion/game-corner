@@ -85,6 +85,7 @@ class ServerWebSocket {
         const isValid = room.members?.length === 2;
         if (isValid) { 
             await this.gameService.createNewGame(roomId);
+            await this.roomService.startGame(roomId);
         }
         await this.broadcastToRoom(roomId, "", "start",
             {
@@ -95,6 +96,7 @@ class ServerWebSocket {
 
     async end(roomId: string) {
         await this.gameService.deleteGame(roomId);
+        await this.roomService.endGame(roomId);
         await this.broadcastToRoom(roomId, "", "end");
     }
 
