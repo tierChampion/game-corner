@@ -11,8 +11,8 @@ const RoomCreationButton: React.FC = () => {
         const roomCreation = async () => {
             try {
                 const room: Room = await api.createRoom();
-                setRoomId(room.id);
-                navigate(`/room/${room.id}`);
+                setRoomId(room._id);
+                navigate(`/room/${room._id}`);
             } catch (err) {
                 console.error("Error when connecting to server, could not create room.");
             }

@@ -5,6 +5,7 @@ import { config } from "dotenv";
 import roomsRouter from "./routes/Rooms.ts";
 import gamesRouter from "./routes/Games.ts";
 import ServerWebSocket from "./utils/Socket.ts";
+import dbService from "./services/Database.service.ts";
 
 const app = express();
 config();
@@ -30,6 +31,8 @@ app.use("/api/games", gamesRouter);
 const SOCKET_PORT = parseInt(process.env.SOCKET_PORT || "");
 const socket = new ServerWebSocket(SOCKET_PORT);
 
-const server = app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
+const server = app.listen(PORT, async () => {
+    dbService.connect(process.env.DB_URL!).then(() => {
+        console.log(`Listening on port ${PORT}`);
+    });
 });

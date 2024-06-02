@@ -1,105 +1,77 @@
-import FileSystemManager from "../utils/FileSystemManager";
+import { ObjectId } from "mongodb";
+import dbService from "./Database.service";
 
 const ROOMS_FILE = "data/rooms.json";
 
 export interface Room {
-    id: string;
+    _id: ObjectId;
     members: string[];
     playing: boolean;
 }
 
 class RoomService {
-    private fsManager: FileSystemManager;
-
-    constructor() {
-        this.fsManager = new FileSystemManager();
+    get collection() {
+        return dbService.getCollection<Room>(process.env.ROOM_COLLECTION!);
     }
 
     async getAllRooms() {
-        try {
-            return JSON.parse(await this.fsManager.readFile(ROOMS_FILE));
-        } catch (error) {
-            console.error("Error parsing the rooms:", error);
-            return [];
-        }
+        return await this.collection?.find({}).toArray();
     }
 
     async getRoom(roomId: string) {
-        return (await this.getAllRooms()).filter((room: Room) => room.id === roomId)[0];
+        return await this.collection?.findOne({ _id: new ObjectId(roomId) });
     }
 
     async createNewRoom() {
-        const rooms = await this.getAllRooms();
-        const newRoom: Room = { id: crypto.randomUUID(), members: [], playing: false };
-        rooms.push(newRoom);
-        await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
+        const newRoom: Room = { _id: new ObjectId(), members: [], playing: false };
+        await this.collection?.insertOne(newRoom);
         return newRoom;
     }
 
     async addPlayer(roomId: string, playerId: string) {
-        let wasModified = false;
-        let rooms = await this.getAllRooms();
-        rooms = rooms.map((room: Room) => {
-            if (room.id === roomId && !room.members.includes(playerId)) {
-                room.members.push(playerId);
-                wasModified = true;
-            }
-            return room;
-        });
-        await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
-        return wasModified;
+        const query = {
+            _id: new ObjectId(roomId),
+            $expr: { $lt: [{ $size: "$members" }, 2] },
+        };
+        const result = await this.collection?.updateOne(query, { $push: { members: playerId } });
+        return result?.modifiedCount !== 0;
     }
 
     async removePlayer(roomId: string, playerId: string) {
+        const result = await this.collection?.findOneAndUpdate({ _id: new ObjectId(roomId) },
+            { $pull: { members: playerId } });
         let wasModified = false;
-        let rooms = await this.getAllRooms();
         let hasEmptyRoom = false;
-        rooms = rooms.filter((room: Room) => {
-            if (room.id === roomId) {
-                let length = room.members.length;
-                room.members = room.members.filter((id: string) => id !== playerId);
-                wasModified = room.members.length !== length;
-            }
-            if (room.members.length === 0 && !room.playing) {
-                hasEmptyRoom = true;
-            }
-            return room;
-        });
-        await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
+        if (result) {
+            wasModified = true;
+            hasEmptyRoom = (result.members.length === 1 &&
+                result.members[0] === playerId) &&
+                !result.playing;
+        }
         if (hasEmptyRoom) {
-            setTimeout(() => this.cleanRooms(), 2000);
+            setTimeout(() => this.cleanRooms(), 3000);
         }
         return wasModified;
     }
 
     async cleanRooms() {
-        let rooms = await this.getAllRooms();
-        rooms = rooms.filter((room: Room) => room.members.length !== 0 || room.playing);
-        await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
+        const filter = {
+            $and: [
+                { members: { $size: 0 } },
+                { playing: false },
+            ]
+        }
+        await this.collection?.deleteMany(filter);
     }
 
     async startGame(roomId: string) {
-        let rooms = await this.getAllRooms();
-        rooms = rooms.map((room: Room) => {
-            if (room.id === roomId) {
-                room.playing = true;
-            }
-            return room;
-        });
-
-        await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
+        await this.collection?.updateOne({ _id: new ObjectId(roomId) },
+            { $set: { playing: true } });
     }
 
     async endGame(roomId: string) {
-        let rooms = await this.getAllRooms();
-        rooms = rooms.map((room: Room) => {
-            if (room.id === roomId) {
-                room.playing = false;
-            }
-            return room;
-        });
-
-        await this.fsManager.writeFile(ROOMS_FILE, JSON.stringify(rooms));
+        await this.collection?.updateOne({ _id: new ObjectId(roomId) },
+            { $set: { playing: false } });
     }
 }
 

@@ -1,4 +1,5 @@
 import FileSystemManager from "../utils/FileSystemManager";
+import dbService from "./Database.service";
 
 const GAMES_FILE = "data/games.json";
 
@@ -14,6 +15,10 @@ class GameService {
 
     constructor() {
         this.fsManager = new FileSystemManager();
+    }
+
+    get collection() {
+        return dbService.getCollection(process.env.GAME_COLLECTION!);
     }
 
     async getAllGames(): Promise<Game[]> {

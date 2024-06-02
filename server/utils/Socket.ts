@@ -82,16 +82,18 @@ class ServerWebSocket {
 
     async start(roomId: string) {
         const room = await this.roomService.getRoom(roomId);
-        const isValid = room.members?.length === 2;
-        if (isValid) { 
+        if (room) {
+            // const isValid = room.members?.length === 2;
+            // if (isValid) { 
             await this.gameService.createNewGame(roomId);
             await this.roomService.startGame(roomId);
+            // }
+            await this.broadcastToRoom(roomId, "", "start",
+                {
+                    isValid: true,
+                    start: room.members[Math.floor(Math.random() * room.members.length)]
+                });
         }
-        await this.broadcastToRoom(roomId, "", "start",
-            {
-                isValid: isValid,
-                start: room.members[Math.floor(Math.random() * room.members.length)]
-            });
     }
 
     async end(roomId: string) {

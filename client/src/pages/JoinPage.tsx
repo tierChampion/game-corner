@@ -37,7 +37,7 @@ const JoinPage: React.FC = () => {
     const joinRoom = (roomId: string) => {
         const roomJoining = async (roomId: string) => {
             const newRooms = await roomsFetch();
-            if (newRooms.find((room: Room) => room.id === roomId) !== undefined) {
+            if (newRooms.find((room: Room) => room._id === roomId) !== undefined) {
                 setRoomId(roomId);
                 navigate(`/room/${roomId}`);
             } else {
@@ -58,8 +58,8 @@ const JoinPage: React.FC = () => {
                         <ScrollArea className="w-full h-2/3 rounded-md border overflow-x-auto">
                             {rooms.map((room: Room, index) => (
                                 <div key={index}>
-                                    <Button variant="ghost" className="text-foreground" onClick={() => joinRoom(room.id)}>
-                                        {room.id + " (" + room.members.length + ")"}
+                                    <Button variant="ghost" className="text-foreground" onClick={() => joinRoom(room._id)}>
+                                        {room._id + " (" + room.members.length + ")"}
                                     </Button>
                                     <Separator className="my-2" />
                                 </div>

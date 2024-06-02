@@ -47,8 +47,8 @@ export const HTTPInterface = {
 };
 
 export interface Room {
-  id: string,
-  members: string[]
+  _id: string,
+  members: string[],
 }
 
 export interface Game {
