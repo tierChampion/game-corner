@@ -1,83 +1,73 @@
-import FileSystemManager from "../utils/FileSystemManager";
+import { ObjectId } from "mongodb";
 import dbService from "./Database.service";
 
 const GAMES_FILE = "data/games.json";
 
 export interface Game {
-    id: string;
+    _id: ObjectId;
     board: number[];
     bank: number[];
     pick: number;
 }
 
 class GameService {
-    private fsManager: FileSystemManager;
-
-    constructor() {
-        this.fsManager = new FileSystemManager();
-    }
-
     get collection() {
-        return dbService.getCollection(process.env.GAME_COLLECTION!);
+        return dbService.getCollection<Game>(process.env.GAME_COLLECTION!);
     }
 
-    async getAllGames(): Promise<Game[]> {
-        try {
-            return JSON.parse(await this.fsManager.readFile(GAMES_FILE));
-        } catch (error) {
-            console.error("Error parsing the games: ", error);
-            return [];
-        }
+    async getAllGames() {
+        return await this.collection?.find({}).toArray();
     }
 
     async getGame(gameId: string) {
-        return (await this.getAllGames()).filter((game: Game) => game.id === gameId)[0];
+        return await this.collection?.findOne({ _id: new ObjectId(gameId) });
     }
 
     async createNewGame(roomId: string) {
-        const games = await this.getAllGames();
         const newGame = {
-            id: roomId,
-            board: Array(4 * 4).fill(-1),
+            _id: new ObjectId(roomId),
+            board: Array(16).fill(-1),
             bank: [...Array(4 * 4)].map((_, index) => index),
             pick: -1
         };
-        games.push(newGame);
-        await this.fsManager.writeFile(GAMES_FILE, JSON.stringify(games));
+        await this.collection?.insertOne(newGame);
         return newGame;
     }
 
-    async pickPiece(gameId: string, pick: number) {
-        let games = await this.getAllGames();
-        games = games.map((game) => {
-            if (game.id === gameId) {
-                game.pick = pick;
-                game.bank[pick] = -1;
+    async placeAndPick(gameId: string, place: number, newPick: number) {
+        const filter = {
+            _id: new ObjectId(gameId)
+        };
+        const update = [{
+            $set: {
+                board: {
+                    $cond: {
+                        if: { $ne: [place, -1] },
+                        then: {
+                            $concatArrays: [
+                                (place !== 0 ? { $slice: ["$board", 0, place] } : []),
+                                ["$pick"],
+                                { $slice: ["$board", place + 1, { $size: "$board" }] }
+                            ]
+                        },
+                        else: "$board"
+                    },
+                },
+                bank: {
+                    $concatArrays: [
+                        (newPick !== 0 ? { $slice: ["$bank", 0, newPick] } : []),
+                        [-1],
+                        { $slice: ["$bank", newPick + 1, { $size: "$bank" }] }
+                    ]
+                },
+                pick: newPick,
             }
-            return game;
-        });
-        await this.fsManager.writeFile(GAMES_FILE, JSON.stringify(games));
-    }
-
-    async placeAndPick(gameId: string, place: number, pick: number) {
-        let games = await this.getAllGames();
-        games = games.map((game) => {
-            if (game.id === gameId && pick !== -1) {
-                if (place !== -1) {
-                    game.board[place] = game.pick;
-                }
-                game.pick = pick;
-                game.bank[pick] = -1;
-            }
-            return game;
-        });
-        await this.fsManager.writeFile(GAMES_FILE, JSON.stringify(games));
+        }];
+        await this.collection?.updateOne(filter, update);
     }
 
     async deleteGame(gameId: string) {
-        let games = await this.getAllGames();
-        games = games.filter((game) => game.id !== gameId);
-        await this.fsManager.writeFile(GAMES_FILE, JSON.stringify(games));
+        await this.collection?.deleteOne({ _id: new ObjectId(gameId) });
     }
 }
 

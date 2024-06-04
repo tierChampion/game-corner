@@ -1,8 +1,6 @@
 import { ObjectId } from "mongodb";
 import dbService from "./Database.service";
 
-const ROOMS_FILE = "data/rooms.json";
-
 export interface Room {
     _id: ObjectId;
     members: string[];
@@ -29,11 +27,11 @@ class RoomService {
     }
 
     async addPlayer(roomId: string, playerId: string) {
-        const query = {
+        const filter = {
             _id: new ObjectId(roomId),
             $expr: { $lt: [{ $size: "$members" }, 2] },
         };
-        const result = await this.collection?.updateOne(query, { $push: { members: playerId } });
+        const result = await this.collection?.updateOne(filter, { $push: { members: playerId } });
         return result?.modifiedCount !== 0;
     }
 

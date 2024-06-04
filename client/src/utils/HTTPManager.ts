@@ -52,7 +52,7 @@ export interface Room {
 }
 
 export interface Game {
-  id: string,
+  _id: string,
   board: number[],
   bank: number[],
   pick: number

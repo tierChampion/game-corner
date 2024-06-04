@@ -52,21 +52,21 @@ const getInitialBank = () => {
 };
 
 const getPiece = (index: number) => {
-    if (index === -1) {
-        return {
-            isValid: false,
-            isBlack: false,
-            isTall: false,
-            isSquare: false,
-            hasHole: false,
-        }
-    } else {
+    if (index >= 0 && index < 16) {
         return {
             isValid: true,
             isBlack: (index & 8) === 0,
             isTall: (index & 4) !== 0,
             isSquare: (index & 2) === 0,
             hasHole: (index & 1) !== 0,
+        }
+    } else {
+        return {
+            isValid: false,
+            isBlack: false,
+            isTall: false,
+            isSquare: false,
+            hasHole: false,
         }
     }
 }
@@ -131,6 +131,24 @@ const analyseBoardState = (turn: boolean, board: QuartoPieceData[]): GameStatus 
     }
 
     return validCount === 16 ? GameStatus.DRAWN : GameStatus.IN_PROGRESS;
+}
+
+const convertBoardAndBank = (game: Game) => {
+    let board = [];
+    let bank = [];
+    for (let j = 0; j < 4; j++) {
+        let boardRow = game.board[j];
+        let bankRow = game.board[j];
+        for (let i = 0; i < 4; i++) {
+            board.push(getPiece(boardRow & 0xFF));
+            boardRow = boardRow << 8;
+
+            bank.push(getPiece(bankRow & 0xFF));
+            bankRow = bankRow << 8;
+        }
+    }
+
+    return { board: board, bank: bank };
 }
 
 const useQuartoStore = create<QuartoState>()((set) => ({
