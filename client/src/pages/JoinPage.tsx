@@ -10,11 +10,13 @@ import RoomCreationButton from "@/components/RoomCreationButton";
 import { Separator } from "@radix-ui/react-separator";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { ScrollBar } from "@/components/ui/scroll-area";
+import { Label } from "@radix-ui/react-label";
 
 const JoinPage: React.FC = () => {
     const { api, setRoomId } = useGlobalStore();
     const navigate = useNavigate();
     const [loaded, setLoaded] = useState<boolean>(false);
+    const [roomWaiting, setRoomWaiting] = useState<number>(-1);
     const [rooms, setRooms] = useState<Room[]>([]);
 
     const roomsFetch = async () => {
@@ -34,32 +36,44 @@ const JoinPage: React.FC = () => {
         initialFetch();
     }, []);
 
-    const joinRoom = (roomId: string) => {
-        const roomJoining = async (roomId: string) => {
-            const newRooms = await roomsFetch();
-            if (newRooms.find((room: Room) => room._id === roomId) !== undefined) {
+    const joinRoom = (index: number, roomId: string) => {
+        setRoomWaiting(index);
+        roomsFetch().then((newRooms) => {
+            const room = newRooms.find((room: Room) => room._id === roomId);
+            setRoomWaiting(-1);
+            if (room !== undefined && room.members.length < 2) {
                 setRoomId(roomId);
                 navigate(`/room/${roomId}`);
+            } else if (room !== undefined) {
+                console.error("Error, the room you want to join is already full!");
             } else {
                 console.error("Error, the room was inactive for too long.");
                 setRooms(newRooms);
             }
-        }
-        roomJoining(roomId);
+        });
     }
 
     if (rooms.length > 0 || !loaded) {
         return (
             <div className="h-screen w-screen flex flex-col items-center bg-background">
                 <InfoHeader />
-                <div className="p-4">
+                <div className="w-3/5 max-h-3/5 p-4 flex flex-col items-center">
                     <h4 className="mb-4 text-sm font-medium leading-none text-foreground">Rooms</h4>
                     {loaded &&
                         <ScrollArea className="w-full h-2/3 rounded-md border overflow-x-auto">
                             {rooms.map((room: Room, index) => (
                                 <div key={index}>
-                                    <Button variant="ghost" className="text-foreground" onClick={() => joinRoom(room._id)}>
-                                        {room._id + " (" + room.members.length + ")"}
+                                    <Button variant="ghost" className="w-full text-foreground" onClick={() => joinRoom(index, room._id)}>
+                                        {
+                                            index !== roomWaiting &&
+                                            <Label>
+                                                {room._id}
+                                            </Label>
+                                        }
+                                        {
+                                            index === roomWaiting &&
+                                            <ReloadIcon className="animate-spin" />
+                                        }
                                     </Button>
                                     <Separator className="my-2" />
                                 </div>

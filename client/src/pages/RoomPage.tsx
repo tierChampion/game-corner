@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@radix-ui/react-label";
 import InfoHeader from "@/components/InfoHeader";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 const RoomPage: React.FC = () => {
     const { api, userId, roomId, setRoomId } = useGlobalStore();
@@ -16,6 +17,8 @@ const RoomPage: React.FC = () => {
 
     const [ready, setReady] = useState<boolean>(false);
     const [members, setMembers] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isStarting, setIsStarting] = useState<boolean>(false);
 
     const { sendJsonMessage, lastJsonMessage } = useCustomWebSocket();
 
@@ -26,9 +29,11 @@ const RoomPage: React.FC = () => {
                 if (command.action === "members") {
                     const room: Room = await api.getRoom(roomId);
                     setMembers(room.members.sort() || []);
+                    setIsLoading(false);
                 }
                 else if (command.action === "start" && command.params.isValid) {
                     startGame(userId, command);
+                    setIsStarting(false);
                     navigate(`../game/${roomId}`);
                 }
             }
@@ -39,15 +44,18 @@ const RoomPage: React.FC = () => {
     return (
         <div className="w-screen h-screen flex flex-col items-center bg-background">
             <InfoHeader />
-            <div className="w-full flex-grow flex items-center justify-around">
-                <div className="">
+            <div className="w-full h-full flex-grow flex items-center justify-around">
+                <div className="w-1/2 h-full flex flex-col items-center justify-center">
                     <Label className="text-foreground">Users:</Label>
-                    <div className="flex flex-col border rounded">
-                        {members.map((member: string, index: number) => (
+                    <div className="w-full min-h-1/3 max-h-1/2 flex flex-col items-center border rounded">
+                        {!isLoading && members.map((member: string, index: number) => (
                             <Label className="text-foreground" key={index}>
-                                {`${index + 1}. ${member}`}
+                                {member}
                             </Label>
                         ))}
+                        {isLoading &&
+                            <ReloadIcon className="text-foreground animate-spin" />
+                        }
                     </div>
                 </div>
                 <div>
@@ -57,10 +65,20 @@ const RoomPage: React.FC = () => {
                     </div>
                     <div className="w-full flex flex-row justify-center">
                         <Button disabled={!ready || members.length !== 2} onClick={() => {
+                            setIsStarting(true);
                             const startCommand = { action: "start", roomId: roomId };
                             sendJsonMessage(startCommand);
                         }}>
-                            Start game
+                            {
+                                !isStarting &&
+                                <Label>
+                                    Start game
+                                </Label>
+                            }
+                            {
+                                isStarting &&
+                                <ReloadIcon className="animate-spin" />
+                            }
                         </Button>
                         <Link to="/">
                             <Button variant="destructive" onClick={() => setRoomId("")}>

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useGlobalStore from "../stores/GlobalStore";
 import QuartoBoard from "@/components/QuartoBoard";
 import QuartoBank from "@/components/QuartoBank";
@@ -10,11 +10,14 @@ import { Command } from "../components/CustomWebSocket";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import InfoHeader from "@/components/InfoHeader";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 const GamePage: React.FC = () => {
     const { api, roomId } = useGlobalStore();
     const { status, turn, pick, place, piece, updateGame } = useQuartoStore();
     const navigate = useNavigate();
+
+    const [isSendingMove, setIsSendingMove] = useState<boolean>(false);
 
     const { sendJsonMessage, lastJsonMessage } = useCustomWebSocket();
 
@@ -28,6 +31,7 @@ const GamePage: React.FC = () => {
                 else if (command.action === "move") {
                     const game = await api.getGame(roomId);
                     updateGame(game);
+                    setIsSendingMove(false);
                 }
             }
         }
@@ -41,8 +45,11 @@ const GamePage: React.FC = () => {
 
     const sendMove = () => {
         if (isMoveValid()) {
+            setIsSendingMove(true);
             const moveAction = { action: "move", gameId: roomId, pick: pick, place: place };
             sendJsonMessage(moveAction);
+        } else {
+            console.error("Error, the move you tried to send is not valid.");
         }
     }
 
@@ -85,7 +92,18 @@ const GamePage: React.FC = () => {
                             </Button>
                         </Link>
                         <Button disabled={!isMoveValid()}
-                            onClick={sendMove}>Confirm move</Button>
+                            onClick={sendMove}>
+                            {
+                                !isSendingMove &&
+                                <Label>
+                                    Confirm move
+                                </Label>
+                            }
+                            {
+                                isSendingMove &&
+                                <ReloadIcon className="animate-spin" />
+                            }
+                        </Button>
 
                     </div>
                 </div>

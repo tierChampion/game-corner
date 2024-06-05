@@ -27,7 +27,6 @@ class ServerWebSocket {
             });
 
             ws.on("close", () => {
-                console.log("closed!");
                 this.close(ws);
             });
         });
@@ -65,11 +64,14 @@ class ServerWebSocket {
     }
 
     async connect(ws: WebSocket, roomId: string, userId: string) {
+        let successful = true;
         if (this.userMap.get(userId) === undefined) {
-            await this.roomService.addPlayer(roomId, userId);
-            const userInformation = { userId: userId, roomId: roomId };
-            this.userInfoMap.set(ws, userInformation);
-            this.userMap.set(userId, ws);
+            successful = await this.roomService.addPlayer(roomId, userId);
+            if (successful) {
+                const userInformation = { userId: userId, roomId: roomId };
+                this.userInfoMap.set(ws, userInformation);
+                this.userMap.set(userId, ws);
+            }
         } else {
             const old = this.userMap.get(userId)!;
             const userInfo = this.userInfoMap.get(old)!;
@@ -77,17 +79,16 @@ class ServerWebSocket {
             this.userInfoMap.delete(old);
             this.userMap.set(userId, ws);
         }
-        await this.broadcastToRoom(roomId, "", "members");
+        if (successful) {
+            await this.broadcastToRoom(roomId, "", "members");
+        }
     }
 
     async start(roomId: string) {
         const room = await this.roomService.getRoom(roomId);
         if (room) {
-            // const isValid = room.members?.length === 2;
-            // if (isValid) { 
             await this.gameService.createNewGame(roomId);
             await this.roomService.startGame(roomId);
-            // }
             await this.broadcastToRoom(roomId, "", "start",
                 {
                     isValid: true,

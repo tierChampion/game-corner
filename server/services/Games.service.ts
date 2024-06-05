@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import dbService from "./Database.service";
 
-const GAMES_FILE = "data/games.json";
+const PIECE_COUNT = 16;
 
 export interface Game {
     _id: ObjectId;
@@ -26,8 +26,8 @@ class GameService {
     async createNewGame(roomId: string) {
         const newGame = {
             _id: new ObjectId(roomId),
-            board: Array(16).fill(-1),
-            bank: [...Array(4 * 4)].map((_, index) => index),
+            board: Array(PIECE_COUNT).fill(-1),
+            bank: [...Array(PIECE_COUNT)].map((_, index) => index),
             pick: -1
         };
         await this.collection?.insertOne(newGame);
