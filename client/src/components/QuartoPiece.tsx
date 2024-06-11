@@ -14,9 +14,10 @@ const QuartoPiece: React.FC<QuartoPieceData> = (pieceData) => {
         if (piece.isValid) {
             style += " valid ";
 
+            // fix colors for dark and light mode
             style += piece.isBlack ? "black " : "white ";
-            style += piece.isTall ? "tall " : "short ";
-            style += piece.isSquare ? "square" : "circle";
+            style += piece.isTall ? "scale-110 " : "scale-75 ";
+            style += piece.isSquare ? " " : "rounded-full ";
         }
 
         return style;
@@ -25,8 +26,7 @@ const QuartoPiece: React.FC<QuartoPieceData> = (pieceData) => {
     return (
         <div className={getStyle(pieceData)}>
             {pieceData.hasHole &&
-                <div className={getStyle(pieceData) + " hole"}>
-                </div>
+                <div className={getStyle(pieceData) + " scale-90"}/>
             }
         </div>
     );

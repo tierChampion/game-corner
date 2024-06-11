@@ -11,6 +11,7 @@ import { Separator } from "@radix-ui/react-separator";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { ScrollBar } from "@/components/ui/scroll-area";
 import { Label } from "@radix-ui/react-label";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const JoinPage: React.FC = () => {
     const { api, setRoomId } = useGlobalStore();
@@ -57,7 +58,7 @@ const JoinPage: React.FC = () => {
         return (
             <div className="h-screen w-screen flex flex-col items-center bg-background">
                 <InfoHeader />
-                <div className="w-3/5 max-h-3/5 p-4 flex flex-col items-center">
+                <div className="w-3/5 h-3/5 p-4 flex flex-col items-center">
                     <h4 className="mb-4 text-sm font-medium leading-none text-foreground">Rooms</h4>
                     {loaded &&
                         <ScrollArea className="w-full h-2/3 rounded-md border overflow-x-auto">
@@ -81,6 +82,9 @@ const JoinPage: React.FC = () => {
                             <ScrollBar orientation="vertical" />
                         </ScrollArea>
                     }
+                    {!loaded &&
+                        <Skeleton className="w-full h-2/3 rounded-md" />
+                    }
                 </div>
                 <Link to="/" className="w-1/4 flex justify-center">
                     <Button>
@@ -94,17 +98,23 @@ const JoinPage: React.FC = () => {
         return (
             <div className="h-screen w-screen flex flex-col items-center bg-background">
                 <InfoHeader />
-                <Alert className="w-3/4">
-                    <CubeIcon></CubeIcon>
-                    <AlertTitle>There are no rooms for now.</AlertTitle>
-                    <AlertDescription>Come back later or create your own!</AlertDescription>
-                </Alert>
-                <RoomCreationButton />
-                <Link to="/" className="w-1/4 flex justify-center">
-                    <Button>
-                        Go back to Home page
-                    </Button>
-                </Link>
+                <div className="w-3/5 h-3/5 p-4 flex flex-col items-center">
+                    <h4 className="mb-4 text-sm font-medium leading-none text-foreground">Rooms</h4>
+                    <Alert className="w-full h-2/3">
+                        <CubeIcon></CubeIcon>
+                        <AlertTitle>There are no rooms for now.</AlertTitle>
+                        <AlertDescription>Come back later or create your own!</AlertDescription>
+                    </Alert>
+
+                </div>
+                <div className="w-1/2 flex items-center justify-center">
+                    <RoomCreationButton />
+                    <Link to="/" className="">
+                        <Button>
+                            Go back to Home page
+                        </Button>
+                    </Link>
+                </div>
             </div>
         );
     }

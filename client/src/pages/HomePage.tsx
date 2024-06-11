@@ -9,9 +9,9 @@ const HomePage: React.FC = () => {
     return (
         <div className="h-screen w-screen flex flex-col bg-background">
             <InfoHeader />
-            <div className="w-full flex flex-col items-center justify-around grow">
+            <div className="w-full flex flex-col items-center justify-around grow ">
                 <Label className="text-8xl text-foreground">Game Corner</Label>
-                <div className="w-full flex flex-row justify-center items-center gap-4">
+                <div className="w-full flex flex-row justify-center items-center">
                     <RoomCreationButton/>
                     <Link to="/join">
                         <Button>

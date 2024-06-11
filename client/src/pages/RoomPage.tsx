@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@radix-ui/react-label";
 import InfoHeader from "@/components/InfoHeader";
 import { ReloadIcon } from "@radix-ui/react-icons";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const RoomPage: React.FC = () => {
     const { api, userId, roomId, setRoomId } = useGlobalStore();
@@ -47,16 +48,17 @@ const RoomPage: React.FC = () => {
             <div className="w-full h-full flex-grow flex items-center justify-around">
                 <div className="w-1/2 h-full flex flex-col items-center justify-center">
                     <Label className="text-foreground">Users:</Label>
-                    <div className="w-full min-h-1/3 max-h-1/2 flex flex-col items-center border rounded">
-                        {!isLoading && members.map((member: string, index: number) => (
+                    {!isLoading && <div className="w-full h-1/3 flex flex-col items-center border rounded">
+                        {members.map((member: string, index: number) => (
                             <Label className="text-foreground" key={index}>
                                 {member}
                             </Label>
                         ))}
-                        {isLoading &&
-                            <ReloadIcon className="text-foreground animate-spin" />
-                        }
-                    </div>
+
+                    </div>}
+                    {isLoading &&
+                        <Skeleton className="w-full h-1/3" />
+                    }
                 </div>
                 <div>
                     <div className="w-full flex flex-row justify-center gap-4">

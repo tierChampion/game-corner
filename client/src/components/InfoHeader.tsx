@@ -1,11 +1,10 @@
 import useGlobalStore from "@/stores/GlobalStore";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { InfoCircledIcon } from "@radix-ui/react-icons";
 import useThemeStore from "@/stores/ThemeStore";
 import { useEffect } from "react";
 import { Label } from "@/components/ui/label";
-import { Info, InfoIcon, Moon, Sun } from "lucide-react";
+import { Info, Moon, Sun } from "lucide-react";
 import { DropdownMenu, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuContent } from "@/components/ui/dropdown-menu";
 
 const InfoHeader: React.FC = () => {
@@ -54,13 +53,13 @@ const InfoHeader: React.FC = () => {
 
             <TooltipProvider>
                 <Tooltip>
-                    <TooltipTrigger>
+                    <TooltipTrigger asChild>
                         <Button variant="ghost" size="icon">
                             <Info className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all text-foreground"/>
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <span>{`UserId: ${userId}`}</span>
+                        <Label>{`UserId: ${userId}`}</Label>
                         {roomId !== "" && <span className="block">{`RoomId: ${roomId}`}</span>}
                     </TooltipContent>
                 </Tooltip>

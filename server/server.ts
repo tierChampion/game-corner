@@ -21,6 +21,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     next();
 });
 
+// app.use((req, res, next) => {
+//   if (req.headers['x-forwarded-proto'] !== 'https') {
+//     return res.redirect(['https://', req.get('Host'), req.url].join(''));
+//   }
+//   next();
+// });
+
+app.use(express.static(path.join(__dirname, "../client/dist")));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: SIZE_LIMIT }));
 app.use(express.static(PUBLIC_PATH));
@@ -30,6 +39,10 @@ app.use("/api/games", gamesRouter);
 
 const SOCKET_PORT = parseInt(process.env.SOCKET_PORT || "");
 const socket = new ServerWebSocket(SOCKET_PORT);
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
+});
 
 const server = app.listen(PORT, async () => {
     dbService.connect(process.env.DB_URL!).then(() => {
