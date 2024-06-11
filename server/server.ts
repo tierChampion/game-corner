@@ -28,7 +28,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 //   next();
 // });
 
-app.use(express.static(path.join(__dirname, "../client/dist")));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: SIZE_LIMIT }));
@@ -40,9 +39,16 @@ app.use("/api/games", gamesRouter);
 const SOCKET_PORT = parseInt(process.env.SOCKET_PORT || "");
 const socket = new ServerWebSocket(SOCKET_PORT);
 
+if (process.env.NODE_ENV === "prod") {
+app.use(express.static(path.join(__dirname, "../client/dist")));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
 });
+}  else {
+  app.get('*', (req, res) => {
+    res.send("Development mode: use Vite server for static files.");
+  })
+}
 
 const server = app.listen(PORT, async () => {
     dbService.connect(process.env.DB_URL!).then(() => {
