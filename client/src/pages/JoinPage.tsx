@@ -44,6 +44,7 @@ const JoinPage: React.FC = () => {
             setRoomWaiting(-1);
             if (room !== undefined && room.members.length < 2) {
                 setRoomId(roomId);
+                // setWs(); Find a way to get the ws url from the server
                 navigate(`/room/${roomId}`);
             } else if (room !== undefined) {
                 console.error("Error, the room you want to join is already full!");

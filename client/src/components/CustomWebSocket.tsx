@@ -1,4 +1,3 @@
-import { SERVER_SOCKET_URL } from "../env";
 import useWebSocket from "react-use-websocket";
 import useGlobalStore from "../stores/GlobalStore";
 
@@ -9,16 +8,15 @@ export interface Command {
 
 const useCustomWebSocket = () => {
 
-    const userId = useGlobalStore((state) => state.userId);
-    const roomId = useGlobalStore((state) => state.roomId);
+    const { userId, roomId } = useGlobalStore();
 
-    const { sendJsonMessage, lastJsonMessage } = useWebSocket(SERVER_SOCKET_URL, {
+    const { sendJsonMessage, lastJsonMessage } = useWebSocket(import.meta.env.VITE_SOCKET_URL, {
         onOpen: () => {
             console.log("connection successful!");
             const connectionAction = { action: "connect", userId: userId, roomId: roomId };
             sendJsonMessage(connectionAction);
         },
-        shouldReconnect: (closeEvent) => {
+        shouldReconnect: () => {
             return true
         }
     });

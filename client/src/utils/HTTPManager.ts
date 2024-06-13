@@ -1,7 +1,6 @@
-import { SERVER_URL } from "../env";
 
 export const HTTPInterface = {
-  SERVER_URL: `${SERVER_URL}/api`,
+  SERVER_URL: `/api`,
 
   GET: async function (endpoint: string) {
     const response = await fetch(`${this.SERVER_URL}/${endpoint}`);

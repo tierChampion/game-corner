@@ -10,7 +10,7 @@ import dbService from "./services/Database.service.ts";
 const app = express();
 config();
 
-const PORT = process.env.PORT;
+const PORT = process.env.SERVER_PORT;
 const SIZE_LIMIT = "10mb";
 const PUBLIC_PATH = path.join(__dirname);
 
@@ -28,7 +28,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 //   next();
 // });
 
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: SIZE_LIMIT }));
 app.use(express.static(PUBLIC_PATH));
@@ -44,7 +43,7 @@ app.use(express.static(path.join(__dirname, "../client/dist")));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
 });
-}  else {
+} else {
   app.get('*', (req, res) => {
     res.send("Development mode: use Vite server for static files.");
   })

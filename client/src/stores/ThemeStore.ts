@@ -1,4 +1,3 @@
-import { THEME_STORAGE_KEY } from "@/env";
 import { create } from "zustand";
 
 type Theme = "dark" | "light" | "system";
@@ -7,6 +6,8 @@ interface ThemeState {
     theme: Theme;
     setTheme: (theme: Theme) => void;
 }
+
+const THEME_STORAGE_KEY = "theme";
 
 const useThemeStore = create<ThemeState>()((set) => ({
     theme: (localStorage.getItem(THEME_STORAGE_KEY) || "system") as Theme,

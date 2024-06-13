@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { SESSION_STORAGE_UID_KEY, SESSION_STORAGE_RID_KEY } from "../env";
 import HTTPManager from "../utils/HTTPManager";
 
 export interface GlobalState {
@@ -9,21 +8,24 @@ export interface GlobalState {
     api: HTTPManager;
 }
 
+const UID_STORAGE_KEY = "uid";
+const RID_STORAGE_KEY = "rid";
+
 const initializeId = () => {
-    let userId: string = sessionStorage.getItem(SESSION_STORAGE_UID_KEY) || "";
+    let userId: string = sessionStorage.getItem(UID_STORAGE_KEY) || "";
 
     if (userId === "") {
         userId = crypto.randomUUID();
-        sessionStorage.setItem(SESSION_STORAGE_UID_KEY, userId);
+        sessionStorage.setItem(UID_STORAGE_KEY, userId);
     }
     return userId;
 }
 
 const useGlobalStore = create<GlobalState>()((set) => ({
     userId: initializeId(),
-    roomId: sessionStorage.getItem(SESSION_STORAGE_RID_KEY) || "",
+    roomId: sessionStorage.getItem(RID_STORAGE_KEY) || "",
     setRoomId: (newRoomId: string) => {
-        sessionStorage.setItem(SESSION_STORAGE_RID_KEY, newRoomId);
+        sessionStorage.setItem(RID_STORAGE_KEY, newRoomId);
         set(() => ({ roomId: newRoomId }));
     },
     api: new HTTPManager(),
