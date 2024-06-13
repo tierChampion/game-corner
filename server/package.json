@@ -12,7 +12,8 @@
     "ws": "^8.17.0"
   },
   "scripts": {
-    "start": "npx nodemon --ignore data server.ts"
+    "start": "npx nodemon --ignore data server.ts",
+    "heroku-postbuild": "cd ../client && npm install && npm run build"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
