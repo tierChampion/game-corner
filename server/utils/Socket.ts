@@ -1,6 +1,8 @@
 import WebSocket from "ws";
 import RoomService from "../services/Rooms.service";
 import GameService from "../services/Games.service";
+import { IncomingMessage } from "http";
+import { Duplex } from "stream";
 
 interface UserInformation {
     userId: string;
@@ -14,8 +16,8 @@ class ServerWebSocket {
     private userInfoMap: Map<WebSocket, UserInformation>;
     private userMap: Map<string, WebSocket>;
 
-    constructor(port: number) {
-        this.wss = new WebSocket.Server({ port: port });
+    constructor() {
+        this.wss = new WebSocket.Server({ noServer: true });
         this.roomService = new RoomService();
         this.gameService = new GameService();
         this.userInfoMap = new Map();
@@ -30,6 +32,12 @@ class ServerWebSocket {
                 this.close(ws);
             });
         });
+    }
+
+    requestConnection(request: IncomingMessage, socket: Duplex, head: any) {
+        this.wss.handleUpgrade(request, socket, head, (ws) => {
+            this.wss.emit("connection", ws, request);
+        })
     }
 
     handleCommand(ws: WebSocket, message: WebSocket.RawData) {
