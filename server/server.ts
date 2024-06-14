@@ -35,7 +35,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use("/api/rooms", roomsRouter);
 app.use("/api/games", gamesRouter);
 
-if (process.env.NODE_ENV === "prod") {
+if (process.env.NODE_ENV === "production") {
 app.use(express.static(path.join(__dirname, "../client/dist")));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
