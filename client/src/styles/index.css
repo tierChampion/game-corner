@@ -1,6 +1,6 @@
 @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   :root {
@@ -49,6 +49,8 @@
   }
 }
 
-html {
-  font-size: 130%;
+@media only screen and (min-width: 768px) {
+  html {
+    font-size: 130%;
+  }
 }
