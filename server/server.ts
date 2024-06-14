@@ -10,7 +10,7 @@ import dbService from "./services/Database.service.ts";
 const app = express();
 config();
 
-const PORT = process.env.SERVER_PORT;
+const PORT = process.env.PORT;
 const SIZE_LIMIT = "10mb";
 const PUBLIC_PATH = path.join(__dirname);
 
