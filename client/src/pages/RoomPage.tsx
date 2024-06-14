@@ -48,7 +48,7 @@ const RoomPage: React.FC = () => {
             <div className="w-full h-full flex-grow flex items-center justify-around">
                 <div className="w-1/2 h-full flex flex-col items-center justify-center">
                     <Label className="text-foreground">Users:</Label>
-                    {!isLoading && <div className="w-full h-1/3 flex flex-col items-center border rounded">
+                    {!isLoading && <div className="w-full h-1/3 flex flex-col items-center justify-around border rounded">
                         {members.map((member: string, index: number) => (
                             <Label className="text-foreground" key={index}>
                                 {member}

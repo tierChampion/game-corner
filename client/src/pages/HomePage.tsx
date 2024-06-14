@@ -10,7 +10,7 @@ const HomePage: React.FC = () => {
         <div className="h-screen w-screen flex flex-col bg-background">
             <InfoHeader />
             <div className="w-full flex flex-col items-center justify-around grow ">
-                <Label className="text-8xl text-foreground">Game Corner</Label>
+                <Label className="text-9xl text-foreground">Game Corner</Label>
                 <div className="w-full flex flex-row justify-center items-center">
                     <RoomCreationButton/>
                     <Link to="/join">
