@@ -25,12 +25,14 @@ class GameService {
 
     async createNewGame(roomId: string) {
         const newGame = {
-            _id: new ObjectId(roomId),
-            board: Array(PIECE_COUNT).fill(-1),
-            bank: [...Array(PIECE_COUNT)].map((_, index) => index),
-            pick: -1
+            $set: {
+                board: Array(PIECE_COUNT).fill(-1),
+                bank: [...Array(PIECE_COUNT)].map((_, index) => index),
+                pick: -1
+            }
         };
-        await this.collection?.insertOne(newGame);
+        await this.collection?.updateOne({ _id: new ObjectId(roomId) },
+            newGame, { upsert: true });
         return newGame;
     }
 

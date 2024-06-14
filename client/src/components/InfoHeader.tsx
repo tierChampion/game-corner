@@ -29,7 +29,6 @@ const InfoHeader: React.FC = () => {
 
     return (
         <div className="w-full flex justify-end">
-
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon">

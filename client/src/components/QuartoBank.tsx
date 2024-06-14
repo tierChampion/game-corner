@@ -12,7 +12,7 @@ const QuartoBank: React.FC = () => {
     }
 
     return (
-        <div className="bank">
+        <div className="bank w-1/5">
             {bank.map((piece: QuartoPieceData, index: number) => {
                 return (
                     <div key={`bank-square-${index}`}

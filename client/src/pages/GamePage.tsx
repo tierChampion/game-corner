@@ -57,8 +57,8 @@ const GamePage: React.FC = () => {
         switch (status) {
             case GameStatus.WON: return "You won!";
             case GameStatus.LOST: return "You lost!";
-            case GameStatus.DRAWN: return "draw!";
-            default: return turn ? "Your turn" : "Waiting for the opponent...";
+            case GameStatus.DRAWN: return "Draw!";
+            default: return turn ? "Your turn" : "Waiting...";
         }
     }
 
@@ -66,23 +66,23 @@ const GamePage: React.FC = () => {
         <div className="w-screen h-screen flex flex-col items-center bg-background overflow-hidden">
             <InfoHeader />
             <div className="w-full flex flex-row items-center justify-around grow">
-                <div className="flex items-center">
+                <div className="w-1/2 h-3/4 flex items-center justify-center">
                     <QuartoBoard />
                     <QuartoBank />
                 </div>
-                <div className="h-full flex flex-col justify-around">
-                    <div className="flex flex-col items-center gap-5">
-                        <div className="flex flex-col items-center gap-8">
+                <div className="w-1/2 h-full flex flex-col justify-center items-center">
+                    <div className="w-1/4 h-1/3 flex flex-col items-center justify-center gap-5">
+                        <div className="flex flex-col items-center">
                             <Label className="text-foreground">{statusMessage()}</Label>
                             <Label className="text-foreground">Piece to play</Label>
                         </div>
-                        <div className="scale-125 chosen-piece-square">
+                        <div className="scale-125 chosen-piece-square w-1/2">
                             {place === -1 &&
                                 <QuartoPiece {...piece} />
                             }
                         </div>
                     </div>
-                    <div className="w-1/2 flex items-center justify-around">
+                    <div className="w-full h-1/4 flex items-center justify-center">
                         <Link to={`/room/${roomId}`}>
                             <Button variant="destructive" onClick={() => {
                                 const endCommand = { action: "end", roomId: roomId };
@@ -104,7 +104,6 @@ const GamePage: React.FC = () => {
                                 <ReloadIcon className="animate-spin" />
                             }
                         </Button>
-
                     </div>
                 </div>
             </div>

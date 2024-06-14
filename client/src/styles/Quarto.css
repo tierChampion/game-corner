@@ -8,11 +8,11 @@
 }
 
 .board {
-    width: 250px;
-    height: 250px;
+    /* width: 250px; */
+    /* height: 250px; */
     border-radius: 10%;
-    border: 3px solid var(--wood-color);
-    background-color: black;
+    border: 0.5vw solid var(--wood-color);
+    /* background-color: black; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -22,8 +22,8 @@
     width: 95%;
     height: 95%;
     border-radius: 100%;
-    border: 2px solid var(--wood-color);
-    background-color: black;
+    border: 0.25vw solid var(--wood-color);
+    /* background-color: black; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -54,10 +54,9 @@
 }
 
 .bank {
-    width: 60px;
-    height: 240px;
-    border: 3px solid var(--wood-color);
-    background-color: black;
+    aspect-ratio: .25;
+    border: 0.5vw solid var(--wood-color);
+    /* background-color: black; */
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(8, 1fr);
@@ -82,11 +81,12 @@
 }
 
 .chosen-piece-square {
-    width: 30px;
-    height: 30px;
-    border: 3px solid var(--wood-color);
+    /* width: 30px; */
+    aspect-ratio: 1;
+    /* height: 30px; */
+    border: 0.2vw solid var(--wood-color);
     border-radius: 10%;
-    background-color: black;
+    /* background-color: black; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -101,11 +101,13 @@
 }
 
 .valid {
-    border: 1px solid rgb(255, 255, 255);
+    border-width: 0.2vw;
+    border-style: solid;
+    /* border: 0.2vw solid; rgb(255, 255, 255); */
 }
 
 .black {
-    background-color: black;
+    background-color: rgb(60, 60, 60);
 }
 
 .white {

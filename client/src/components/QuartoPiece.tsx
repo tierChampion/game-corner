@@ -12,11 +12,11 @@ const QuartoPiece: React.FC<QuartoPieceData> = (pieceData) => {
     const getStyle = (piece: QuartoPieceData) => {
         let style = "piece";
         if (piece.isValid) {
-            style += " valid ";
+            style += " valid border-foreground ";
 
             // fix colors for dark and light mode
             style += piece.isBlack ? "black " : "white ";
-            style += piece.isTall ? "scale-110 " : "scale-75 ";
+            style += piece.isTall ? "scale-125 " : "scale-75 ";
             style += piece.isSquare ? " " : "rounded-full ";
         }
 
